@@ -1,0 +1,39 @@
+div.download-container {
+
+  div.header {
+    padding: 5px;
+
+    span {
+      color: white;
+    }
+  }
+
+  div.center {
+    margin: 5px 10px;
+
+    span.current {
+      position: absolute;
+      color: black;
+      width: 80px;
+      height: 80px;
+    }
+
+    span.chart {
+      width: 80px;
+      height: 80px;
+    }
+
+    div.info-container {
+      gap: 5px;
+
+      span {
+        display: flex;
+        align-self: flex-end;
+      }
+    }
+  }
+
+  div.footer {
+    padding: 5px;
+  }
+}

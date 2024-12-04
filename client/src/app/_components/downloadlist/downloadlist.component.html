@@ -1,0 +1,27 @@
+<button class="back-nav-btn" mat-icon-button (click)="goHome()">
+  <mat-icon>arrow_back_ios</mat-icon>
+</button>
+
+<div class="page">
+  <div class="pt-2 mb-1 text-end">
+    <strong>Totale:</strong> &nbsp;&nbsp; {{ totalFiles() }} download
+    &nbsp;&nbsp;&nbsp; <strong>Stato:</strong> &nbsp;&nbsp;
+    <mat-select
+      class="status-dropdown"
+      [(value)]="statusFilter"
+      (selectionChange)="fetchList()"
+    >
+      @for (status of downloadStatusOptions; track status) {
+      <mat-option [value]="status">{{ status | titlecase }}</mat-option>
+      }
+    </mat-select>
+  </div>
+  <div class="pb-3 px-0 download-container">
+    @for (item of downloadList(); track item) {
+    <app-downlad-item
+      class="d-block mb-3"
+      [downloadItem]="item"
+    ></app-downlad-item>
+    }
+  </div>
+</div>

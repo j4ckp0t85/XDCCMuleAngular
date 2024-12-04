@@ -1,0 +1,29 @@
+<button class="back-nav-btn" mat-icon-button (click)="goHome()">
+  <mat-icon>arrow_back_ios</mat-icon>
+</button>
+
+<div class="page">
+  <div class="mt-5">
+    <h3>Reset massivo</h3>
+    <form [formGroup]="confFormGroup">
+      <mat-checkbox
+        class="d-flex col-md-3 col-sm-12"
+        formControlName="deleteAllJobs"
+        >Annulla tutti i job</mat-checkbox
+      >
+      <mat-checkbox
+        class="d-flex col-md-3 col-sm-12"
+        formControlName="closeAllXdccInstances"
+        >Chiudi tutte le istance XDCCJs</mat-checkbox
+      >
+      <mat-checkbox
+        class="d-flex col-md-3 col-sm-12"
+        formControlName="cleanDownloads"
+        >Ripulisci i download completati e annullati</mat-checkbox
+      >
+    </form>
+    <button mat-raised-button color="primary" class="mt-3" (click)="reset()">
+      Reset
+    </button>
+  </div>
+</div>

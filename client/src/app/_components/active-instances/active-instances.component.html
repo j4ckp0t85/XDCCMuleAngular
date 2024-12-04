@@ -1,0 +1,48 @@
+<button class="back-nav-btn" mat-icon-button (click)="goHome()">
+  <mat-icon>arrow_back_ios</mat-icon>
+</button>
+
+<div class="page">
+  @if(isFetching()) {
+  <div class="mt-5">
+    <h3>Caricamento istanze in corso...</h3>
+  </div>
+  } @else if(activeNetworks && activeNetworks.length > 0) {
+  <div class="mt-5">
+    <h3>Tabella istanze network attive</h3>
+    <table
+      #searchTable
+      mat-table
+      matSort
+      matTableResponsive
+      [dataSource]="activeNetworks"
+      class="mt-2 table table-responsive table-hover table-striped mat-elevation-z8"
+    >
+      <ng-container matColumnDef="network">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Network</th>
+        <td mat-cell *matCellDef="let element">{{ element.network }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Azione</th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="quitInstance(element.network)"
+          >
+            <mat-icon>flash_off</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+  }@else {
+  <div class="mt-5">
+    <h3>Nessuna istanza attiva</h3>
+  </div>
+  }
+</div>

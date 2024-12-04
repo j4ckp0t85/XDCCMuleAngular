@@ -1,0 +1,50 @@
+@use '@angular/material'as mat;
+@import "bootstrap/scss/bootstrap-utilities";
+
+//Generate utilites for Cursor
+$utilities: map-merge($utilities,
+  ("cursor": (property: cursor,
+      values: auto default pointer wait text move help not-allowed),
+  ));
+
+@import 'bootstrap/scss/bootstrap';
+@import 'app/_shared/_styles/mat-table-responsive-directive.scss';
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @include mat.all-component-densities(-3);
+  margin: 0;
+  padding: 15px 45px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 300 !important;
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+  button.back-nav-btn {
+    position: fixed;
+    top: 17px;
+    padding: 0;
+  }
+
+  @media (max-width: 600px) {
+    button.back-nav-btn {
+      left: 5px;
+    }
+  }
+
+  div.page {
+    // max-width: 65vw;
+    margin: 0 auto;
+  }
+}
+
+mat-icon {
+  overflow: unset !important;
+}

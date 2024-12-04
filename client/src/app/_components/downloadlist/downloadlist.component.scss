@@ -1,0 +1,15 @@
+.status-dropdown {
+  width: 170px;
+}
+
+@media (max-width: 800px) {
+  .download-container {
+    padding: 0 5%;
+  }
+}
+
+@media (min-width: 801px) {
+  .download-container {
+    padding: 0 15%;
+  }
+}
