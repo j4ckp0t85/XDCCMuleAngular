@@ -4,8 +4,7 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  computed,
-  effect,
+  linkedSignal,
   signal,
 } from '@angular/core';
 import { Subscription, interval, startWith, switchMap } from 'rxjs';
@@ -41,7 +40,10 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
     'error',
     'cancelled',
   ];
-  totalFiles = computed(() => this.downloadList()?.length);
+  totalFiles = linkedSignal({
+    source: this.downloadList,
+    computation: (downloadList: DownloadingFile[]) => downloadList.length,
+  });
   private subscriptions = new Subscription();
   private actualSubscription!: Subscription | undefined;
   constructor(private httpClient: HttpClient, private router: Router) {}
