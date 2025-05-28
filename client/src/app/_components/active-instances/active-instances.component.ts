@@ -6,24 +6,24 @@ import {
   catchError,
   interval,
   of,
-  startWith,
   switchMap,
 } from 'rxjs';
 import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
-import { MaterialModule } from '../../material.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatTableResponsiveDirective } from '../../_shared/_directive/material-table-responsive.directive';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { PrimeNgModule } from '../../primeng.module';
+import { MessageService } from 'primeng/api';
+import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
 
 @Component({
     selector: 'app-active-instances',
+    standalone: true,
     imports: [
-        MaterialModule,
         CommonModule,
         FormsModule,
-        MatTableResponsiveDirective,
+        PrimeNgModule,
+        BackButtonComponent
     ],
     templateUrl: './active-instances.component.html',
     styleUrl: './active-instances.component.scss'
@@ -37,7 +37,7 @@ export class ActiveInstancesComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private httpClient: HttpClient,
-    private snackBar: MatSnackBar
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -83,9 +83,7 @@ export class ActiveInstancesComponent implements OnInit, OnDestroy {
       .post(`${API_BASE_URL}/quitinstance`, { network })
       .pipe(catchError(() => EMPTY))
       .subscribe(() =>
-        this.snackBar.open(`Network ${network} rimosso`, undefined, {
-          duration: 3000,
-        })
+        this.messageService.add({ severity: 'success', summary: `Network ${network} rimosso`, detail: '' })
       );
     this.subscriptions.add(quitSub);
   }

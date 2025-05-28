@@ -1,0 +1,47 @@
+// Importa lo stile del titolo della pagina
+@import '../../_shared/styles/page-title';
+
+// Stile personalizzato per la tabella
+:host ::ng-deep .custom-table {
+  width: 100%;
+  table-layout: fixed;
+  
+  th, td {
+    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  // Assicura che la tabella si adatti alla larghezza disponibile
+  .p-datatable-wrapper {
+    overflow-x: hidden;
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  // Stile per il bottone nella seconda colonna
+  td:last-child {
+    text-align: center;
+    
+    button {
+      // Assicura che il bottone non causi overflow
+      max-width: 100%;
+    }
+  }
+  
+  // Gestione responsive senza scroll orizzontale
+  @media screen and (max-width: 768px) {
+    th, td {
+      display: table-cell !important;
+      width: 50% !important;
+      padding: 0.5rem !important;
+    }
+    
+    // Riduce la dimensione del testo se necessario
+    td:first-child {
+      font-size: 0.9rem;
+    }
+  }
+}

@@ -1,0 +1,80 @@
+.results-container {
+  width: 100%;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.results {
+  overflow-x: auto;
+  margin: 0 -15px;  // Compensate for padding
+  padding: 0 15px;
+}
+
+
+
+/* Stili per tablet e desktop */
+@media (min-width: 768px) {
+  ::ng-deep .p-datatable {
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      &:nth-child(1),  /* server */
+      &:nth-child(2),  /* channel */
+      &:nth-child(4),  /* bot */
+      &:nth-child(5) { /* filesize */
+        width: 10%;
+      }
+
+      &:nth-child(3) { /* package */
+        width: 8%;
+      }
+
+      &:nth-child(6) { /* filename */
+        width: 42%;
+      }
+
+      &:nth-child(7) { /* action */
+        width: 10%;
+        text-align: center;
+      }
+    }
+  }
+}
+
+/* Stili per iPad Air in landscape (820px) */
+@media (max-width: 1024px) and (min-width: 768px) {
+  ::ng-deep .p-datatable {
+    font-size: 0.9rem;
+
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      &:nth-child(1) { /* server */
+        width: 12%;
+      }
+
+      &:nth-child(3) { /* package */
+        width: 7%;
+      }
+
+      &:nth-child(6) { /* filename */
+        width: 41%;
+      }
+    }
+  }
+}
+
+/* Stili per dispositivi mobili */
+@media (max-width: 767.98px) {
+  ::ng-deep .p-paginator {
+    overflow-x: auto;
+  }
+
+  ::ng-deep .p-datatable {
+    font-size: 0.85rem;
+  }
+}

@@ -1,44 +1,43 @@
-import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { MatTableResponsiveDirective } from '../../_shared/_directive/material-table-responsive.directive';
-import { MaterialModule } from '../../material.module';
-import { Router } from '@angular/router';
-import { EMPTY, Subscription, catchError } from 'rxjs';
+  EMPTY,
+  Subscription,
+  catchError,
+  interval,
+  of,
+  switchMap,
+} from 'rxjs';
 import { API_BASE_URL } from '../../_shared/config';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
-interface ConfForm {
-  deleteAllJobs: boolean;
-  closeAllXdccInstances: boolean;
-  cleanDownloads: boolean;
-}
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PrimeNgModule } from '../../primeng.module';
+import { MessageService } from 'primeng/api';
+import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
 
 @Component({
     selector: 'app-reset',
+    standalone: true,
     imports: [
-        MaterialModule,
         CommonModule,
+        FormsModule,
         ReactiveFormsModule,
-        MatTableResponsiveDirective,
+        PrimeNgModule,
+        BackButtonComponent
     ],
     templateUrl: './reset.component.html',
     styleUrl: './reset.component.scss'
 })
 export class ResetComponent implements OnDestroy {
-  confFormGroup!: FormGroup;
-  suscriptions = new Subscription();
+  subscriptions = new Subscription();
+  confFormGroup: FormGroup;
+
   constructor(
     private router: Router,
-    private fb: FormBuilder,
     private httpClient: HttpClient,
-    private snackbar: MatSnackBar
+    private fb: FormBuilder,
+    private messageService: MessageService
   ) {
     this.confFormGroup = this.fb.group({
       deleteAllJobs: this.fb.control(false),
@@ -48,7 +47,7 @@ export class ResetComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.suscriptions.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 
   goHome() {
@@ -60,8 +59,8 @@ export class ResetComponent implements OnDestroy {
       .post(`${API_BASE_URL}/reset`, this.confFormGroup.getRawValue())
       .pipe(catchError(() => EMPTY))
       .subscribe(() =>
-        this.snackbar.open('Reset completato', undefined, { duration: 3000 })
+        this.messageService.add({ severity: 'success', summary: 'Reset completato', detail: '' })
       );
-    this.suscriptions.add(resetSub);
+    this.subscriptions.add(resetSub);
   }
 }

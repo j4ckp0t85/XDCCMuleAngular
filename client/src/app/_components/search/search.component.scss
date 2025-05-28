@@ -1,42 +1,33 @@
-::ng-deep {
-  .search-container {
-    padding: 0 15%;
+// Importa lo stile del titolo della pagina
+@import '../../_shared/styles/page-title';
 
-    div.mat-mdc-form-field-subscript-wrapper {
-      display: none;
-    }
+.page {
+  padding-top: 2rem;
+}
 
-    span.mdc-list-item__primary-tex {
-      color: blue;
-    }
+.search-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.results-wrapper {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+
+  h3 {
+    color: var(--primary-color);
+    font-weight: 500;
   }
-
-  .pagination-container {
-    padding: 0 15%;
-  }
-
-  div.results {
-    padding: 0 15%;
-
-    th.mat-sort-header-sorted {
-      color: black;
-    }
-  }
-
-  // override padding rules when width < 600px
-  @media (max-width: 600px) {
-    .search-container {
-      padding: 0;
-    }
-
-    .pagination-container {
-      padding: 0;
-    }
-
-    div.results {
-      padding: 0;
-    }
-  }
-
-
 }

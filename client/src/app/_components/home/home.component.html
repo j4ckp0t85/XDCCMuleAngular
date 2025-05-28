@@ -1,24 +1,51 @@
-<main class="main">
-  <div class="content page">
-    <div class="left-side d-flex">
-      <h3 class="me-3">XDCCAngular</h3>
-      <img
-        src="assets/logo.png"
-        alt="XDCCAngular logo"
-        width="30"
-        height="30"
-      />
-    </div>
-    <div class="divider" role="separator" aria-label="Divider"></div>
-    <div class="right-side">
-      <div class="pill-group">
-        @for (item of items; track item.title) {
-        <a class="d-flex align-items-center gap-2" [routerLink]="item.link">
-          <mat-icon class="material-icons-outlined">{{ item.icon }}</mat-icon>
-          <span>{{ item.title | uppercase }}</span>
-        </a>
-        }
+<div class="home-container fade-in">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+              <div class="d-flex align-items-center justify-content-center mb-3">
+                <h2 class="app-title me-3 mb-0">XDCCMuleAngular</h2>
+                <img
+                  src="assets/logo.png"
+                  alt="XDCCMuleAngular logo"
+                  width="40"
+                  height="40"
+                  class="logo-img"
+                />
+              </div>
+              <p class="text-muted">Il tuo client XDCC moderno e intuitivo</p>
+            </div>
+
+            <div class="divider mb-4"></div>
+
+            <div class="menu-options">
+              <div class="row g-4">
+                @for (item of items; track item.title) {
+                <div class="col-md-6">
+                  <a [routerLink]="item.link" class="menu-item-link">
+                    <div class="menu-item d-flex align-items-center p-3 rounded">
+                      <div class="icon-container me-3 d-flex align-items-center justify-content-center">
+                        <i [class]="'pi pi-' + item.icon"></i>
+                      </div>
+                      <div>
+                        <h5 class="mb-1">{{ item.title }}</h5>
+                        <p class="mb-0 text-muted small">{{ item.description }}</p>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                }
+              </div>
+            </div>
+
+            <div class="text-center mt-5">
+              <p class="small text-muted">© 2025 XDCCMuleAngular - Versione 1.0.0</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</main>
+</div>

@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Injector } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
 import { API_BASE_URL } from "../config";
 import { catchError, EMPTY } from "rxjs";
+import { MessageService } from "primeng/api";
 
 export function downloadFile(
 	injector: Injector,
@@ -14,7 +14,7 @@ export function downloadFile(
 	fileSize: string
 ) {
 	const httpClient = injector.get(HttpClient);
-	const snackBar = injector.get(MatSnackBar);
+	const messageService = injector.get(MessageService);
 	const dlSub = httpClient
 		.post(`${API_BASE_URL}/download`, {
 			server,
@@ -26,9 +26,7 @@ export function downloadFile(
 		})
 		.pipe(catchError(() => EMPTY))
 		.subscribe(() =>
-			snackBar.open(`Accodato download ${fileName}`, undefined, {
-				duration: 3000,
-			})
+			messageService.add({ severity: 'success', summary: `Accodato download ${fileName}`, detail: '' })
 		);
 	return dlSub;
 }

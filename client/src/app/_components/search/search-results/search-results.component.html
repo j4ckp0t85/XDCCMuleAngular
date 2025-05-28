@@ -1,0 +1,73 @@
+<div class="results-container">
+  <!-- Paginator -->
+  <p-paginator
+    [rows]="pageSize()"
+    [totalRecords]="results().length"
+    [rowsPerPageOptions]="[15, 30, 50]"
+    (onPageChange)="onPageEvent($event)"
+    [showFirstLastIcon]="true"
+    [first]="first"
+    class="mt-1 mb-1"
+    [ngClass]="results().length === 0 ? 'invisible' : 'visible'"
+  ></p-paginator>
+
+  <!-- Results Table -->
+  <div class="results">
+    <p-table
+      [value]="displayedData"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      [paginator]="false"
+      [ngClass]="results().length === 0 ? 'invisible' : 'visible'"
+      styleClass="p-datatable-custom"
+      [rowTrackBy]="trackByFn"
+      [scrollable]="true"
+      scrollHeight="flex"
+      [frozenColumns]="frozenCols"
+      [columns]="cols"
+    >
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of frozenCols" pFrozenColumn>
+            {{ col.header }}
+          </th>
+          <th *ngFor="let col of columns">
+            {{ col.header }}
+          </th>
+          <th pFrozenColumn alignFrozen="right">Azione</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-element let-columns="columns">
+        <tr>
+          <td *ngFor="let col of frozenCols" pFrozenColumn>
+            {{ element[col.field] }}
+          </td>
+          <td *ngFor="let col of columns">
+            {{ element[col.field] }}
+          </td>
+          <td pFrozenColumn alignFrozen="right">
+            <button
+              pButton
+              icon="pi pi-download"
+              class="p-button-rounded p-button-primary download-button"
+              (click)="
+                onDownload(
+                  element.server,
+                  element.channel,
+                  element.bot,
+                  element.package,
+                  element.filename,
+                  element.filesize
+                )
+              "
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center">Nessun risultato trovato</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

@@ -166,6 +166,28 @@ app.post('/search', async (req, res) => {
   }
 });
 
+app.post('/news', async (req, res) => {
+  const { newsurl, headers } = req.body;
+  try {
+    const httpres = await fetch(newsurl, {
+      headers
+    });
+    if (httpres.ok) {
+      const textNonFormatted = await httpres.text();
+      if (typeof textNonFormatted === 'string') {
+        res.send(textNonFormatted);
+        return;
+      }
+      res.sendStatus(400);
+    } else {
+      res.sendStatus(500);
+    }
+  } catch (e) {
+    console.log('error fetching db list from url ' + newsurl);
+    res.sendStatus(404);
+  }
+});
+
 const credentials = {
   key: fs.readFileSync('ca-key.pem'),
   cert: fs.readFileSync('ca.pem')
@@ -175,4 +197,3 @@ const httpsServer = https.createServer(credentials, app);
 httpsServer.listen(8443, () => {
   console.log('Server listening on port 8443');
 });
-

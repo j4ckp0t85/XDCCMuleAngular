@@ -1,29 +1,41 @@
-<button class="back-nav-btn" mat-icon-button (click)="goHome()">
-  <mat-icon>arrow_back_ios</mat-icon>
-</button>
+<app-back-button></app-back-button>
 
 <div class="page">
-  <div class="mt-5">
-    <h3>Reset massivo</h3>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center">
+        <h2 class="page-title mb-0">Reset Sistema</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-3">
     <form [formGroup]="confFormGroup">
-      <mat-checkbox
-        class="d-flex col-md-3 col-sm-12"
-        formControlName="deleteAllJobs"
-        >Annulla tutti i job</mat-checkbox
-      >
-      <mat-checkbox
-        class="d-flex col-md-3 col-sm-12"
-        formControlName="closeAllXdccInstances"
-        >Chiudi tutte le istance XDCCJs</mat-checkbox
-      >
-      <mat-checkbox
-        class="d-flex col-md-3 col-sm-12"
-        formControlName="cleanDownloads"
-        >Ripulisci i download completati e annullati</mat-checkbox
-      >
+      <div>
+        <p-checkbox
+          [binary]="true"
+          formControlName="deleteAllJobs"
+          inputId="del"
+        />
+        <label class="ms-2" for="del">Annulla tutti i job</label>
+      </div>
+      <div>
+        <p-checkbox
+          [binary]="true"
+          formControlName="closeAllXdccInstances"
+          inputId="cls"
+        />
+        <label class="ms-2" for="cls">Chiudi tutte le istance XDCCJs</label>
+      </div>
+      <div>
+        <p-checkbox
+          [binary]="true"
+          formControlName="cleanDownloads"
+          inputId="cln"
+        />
+        <label class="ms-2" for="cln">Pulisci download completati</label>
+      </div>
     </form>
-    <button mat-raised-button color="primary" class="mt-3" (click)="reset()">
-      Reset
-    </button>
+    <button class="mt-3" pButton type="button" (click)="reset()">Reset</button>
   </div>
 </div>

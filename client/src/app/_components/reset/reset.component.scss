@@ -1,0 +1,8 @@
+// Importa lo stile del titolo della pagina
+@import '../../_shared/styles/page-title';
+
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}

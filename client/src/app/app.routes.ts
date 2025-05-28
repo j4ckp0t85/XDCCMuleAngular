@@ -4,6 +4,7 @@ import { SearchComponent } from './_components/search/search.component';
 import { HomeComponent } from './_components/home/home.component';
 import { DownloadlistComponent } from './_components/downloadlist/downloadlist.component';
 import { ActiveInstancesComponent } from './_components/active-instances/active-instances.component';
+import { NewsComponent } from './_components/news/news.component';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,10 @@ export const routes: Routes = [
   {
     path: 'reset',
     component: ResetComponent,
+  },
+  {
+    path: 'news',
+    component: NewsComponent,
   },
   {
     path: '**',

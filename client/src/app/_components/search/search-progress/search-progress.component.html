@@ -1,0 +1,7 @@
+@if(isVisible()) {
+  <div class="mt-3 row progressbar">
+    <div class="col-12">
+      <p-progressBar [value]="roundedPercentage()">{{ roundedPercentage() }}%</p-progressBar>
+    </div>
+  </div>
+}

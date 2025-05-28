@@ -1,27 +1,94 @@
-<button class="back-nav-btn" mat-icon-button (click)="goHome()">
-  <mat-icon>arrow_back_ios</mat-icon>
-</button>
+<app-back-button></app-back-button>
 
 <div class="page">
-  <div class="pt-2 mb-1 text-end">
-    <strong>Totale:</strong> &nbsp;&nbsp; {{ totalFiles() }} download
-    &nbsp;&nbsp;&nbsp; <strong>Stato:</strong> &nbsp;&nbsp;
-    <mat-select
-      class="status-dropdown"
-      [(value)]="statusFilter"
-      (selectionChange)="fetchList()"
-    >
-      @for (status of downloadStatusOptions; track status) {
-      <mat-option [value]="status">{{ status | titlecase }}</mat-option>
-      }
-    </mat-select>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center">
+        <h2 class="page-title mb-0">Download</h2>
+      </div>
+    </div>
   </div>
-  <div class="pb-3 px-0 download-container">
-    @for (item of downloadList(); track item) {
-    <app-downlad-item
-      class="d-block mb-3"
-      [downloadItem]="item"
-    ></app-downlad-item>
+  <div class="w-100 flex align-items-center justify-content-between mb-3">
+    <div>
+      <button 
+        pButton 
+        type="button" 
+        label="Pulisci i download" 
+        icon="pi pi-trash" 
+        class="p-button-danger" 
+        (click)="cleanDownloads()"
+      ></button>
+    </div>
+    <div class="flex align-items-center gap-3">
+      <div class="flex align-items-center">
+        <strong>Totale:</strong> &nbsp;{{ totalFiles() }} download &nbsp;&nbsp;
+        <strong>Stato:</strong> &nbsp;
+        <p-dropdown
+          [(ngModel)]="statusFilter"
+          [options]="downloadStatusOptions"
+          (onChange)="fetchList()"
+          [style]="{ width: '130px' }"
+          optionLabel="label"
+          optionValue="value"
+        ></p-dropdown>
+      </div>
+      <div class="flex layout-options">
+        <button
+          type="button"
+          class="layout-btn grid-btn"
+          [class.active]="layout === 'grid'"
+          (click)="setLayout('grid')"
+        >
+          <i class="pi pi-th-large"></i>
+        </button>
+        <button
+          type="button"
+          class="layout-btn list-btn"
+          [class.active]="layout === 'list'"
+          (click)="setLayout('list')"
+        >
+          <i class="pi pi-bars"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (layout === 'grid') {
+  <div class="grid">
+    @for (item of displayedData(); track getItemTrackKey(0, item)) {
+    <div class="col-12 sm:col-6 lg:col-4 xl:col-3 p-2">
+      <app-download-item
+        [item]="item"
+        [layout]="'grid'"
+      ></app-download-item>
+    </div>
     }
   </div>
+  } @else {
+  <div class="list">
+    @for (item of displayedData(); track getItemTrackKey(0, item)) {
+    <div class="mb-2">
+      <app-download-item
+        [item]="item"
+        [layout]="'list'"
+      ></app-download-item>
+    </div>
+    }
+  </div>
+  }
+
+  <p-paginator
+    [rows]="pageSize"
+    [totalRecords]="totalFiles()"
+    [rowsPerPageOptions]="[12, 24, 36]"
+    (onPageChange)="onPageEvent($event)"
+    [showFirstLastIcon]="true"
+    [first]="first"
+    class="mt-3"
+    [ngClass]="totalFiles() === 0 ? 'invisible' : 'visible'"
+  ></p-paginator>
+
+  @if (totalFiles() === 0) {
+  <div class="p-4 text-center">Nessun download disponibile.</div>
+  }
 </div>

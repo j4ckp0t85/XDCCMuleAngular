@@ -1,0 +1,189 @@
+<!-- Grid Layout -->
+<div *ngIf="layout === 'grid'" class="download-card border-1 surface-border surface-card border-round">
+  <!-- Progress Bar -->
+  <p-progressBar
+    [value]="item.percentage"
+    [showValue]="false"
+    [style]="{'height': '4px'}"
+    [styleClass]="'progress-' + item.status"
+  ></p-progressBar>
+  
+  <div class="card-content">
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Filename -->
+      <div class="filename text-break">{{ item.fileName }}</div>
+      
+      <!-- Tags -->
+      <div class="tags flex gap-1 flex-wrap">
+        <p-chip [label]="item.network" [removable]="false" styleClass="small-chip"></p-chip>
+        <p-chip [label]="item.channelName" [removable]="false" styleClass="small-chip"></p-chip>
+        <p-chip [label]="item.botName" [removable]="false" styleClass="small-chip"></p-chip>
+      </div>
+
+      <!-- Info -->
+      <div class="info-section">
+        <div class="info-row">
+          <span class="percentage">{{ item.percentage }}%</span>
+          <span class="flex align-items-center gap-1">
+            <i class="pi pi-save"></i>
+            {{ item.fileSize }}
+          </span>
+          <ng-container *ngIf="item.status === 'downloading'">
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-download"></i>
+              {{ item.rate }}
+            </span>
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-clock"></i>
+              {{ item.eta }}
+            </span>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button
+        pButton
+        icon="pi pi-search"
+        class="p-button-rounded p-button-outlined p-button-sm"
+        (click)="redoSearch(item.fileName)"
+        pTooltip="Cerca di nuovo"
+      ></button>
+
+      <button
+        *ngIf="item.status === 'error'"
+        pButton
+        icon="pi pi-refresh"
+        class="p-button-rounded p-button-outlined p-button-danger p-button-sm"
+        (click)="retryDL()"
+        pTooltip="Riprova"
+      ></button>
+
+      <button
+        *ngIf="item.status !== 'pending' && item.percentage !== 100"
+        pButton
+        icon="pi pi-file"
+        class="p-button-rounded p-button-outlined p-button-sm"
+        (click)="showLogs()"
+        pTooltip="Mostra logs"
+      ></button>
+
+      <button
+        *ngIf="(item.status === 'downloading' || item.status === 'pending') && item.percentage !== 100"
+        pButton
+        icon="pi pi-trash"
+        class="p-button-rounded p-button-outlined p-button-danger p-button-sm"
+        (click)="cancelDL()"
+        pTooltip="Cancella download"
+      ></button>
+
+      <button
+        *ngIf="item.status === 'downloaded' || item.status === 'cancelled' || item.status === 'error' || item.percentage === 100"
+        pButton
+        icon="pi pi-check"
+        class="p-button-rounded p-button-outlined p-button-sm"
+        (click)="clearCompletedDL()"
+        pTooltip="Rimuovi"
+      ></button>
+    </div>
+  </div>
+</div>
+
+<!-- List Layout -->
+<div *ngIf="layout === 'list'" class="download-list-item border-round">
+  <div class="flex align-items-center gap-3">
+    <!-- Progress Circle -->
+    <div class="progress-section">
+      <p-knob
+        [(ngModel)]="item.percentage"
+        [size]="60"
+        [readonly]="true"
+        [valueColor]="getProgressColor(item)"
+        [strokeWidth]="6"
+        styleClass="list-knob"
+      ></p-knob>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-grow-1">
+      <!-- Filename -->
+      <div class="filename text-break mb-1">{{ item.fileName }}</div>
+
+      <!-- Info and Tags -->
+      <div class="flex flex-wrap gap-2 align-items-center">
+        <div class="tags flex gap-1">
+          <p-chip [label]="item.network" [removable]="false" styleClass="small-chip"></p-chip>
+          <p-chip [label]="item.channelName" [removable]="false" styleClass="small-chip"></p-chip>
+          <p-chip [label]="item.botName" [removable]="false" styleClass="small-chip"></p-chip>
+        </div>
+
+        <div class="info-section flex gap-2 text-sm">
+          <span class="flex align-items-center gap-1">
+            <i class="pi pi-save"></i>
+            {{ item.fileSize }}
+          </span>
+          <ng-container *ngIf="item.status === 'downloading'">
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-download"></i>
+              {{ item.rate }}
+            </span>
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-clock"></i>
+              {{ item.eta }}
+            </span>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions flex gap-1">
+      <button
+        pButton
+        icon="pi pi-search"
+        class="p-button-rounded p-button-outlined p-button-sm"
+        (click)="redoSearch(item.fileName)"
+        pTooltip="Cerca di nuovo"
+      ></button>
+
+      <button
+        *ngIf="item.status === 'error'"
+        pButton
+        icon="pi pi-refresh"
+        class="p-button-rounded p-button-outlined p-button-danger p-button-sm"
+        (click)="retryDL()"
+        pTooltip="Riprova"
+      ></button>
+
+      <button
+        *ngIf="item.status !== 'pending' && item.percentage !== 100"
+        pButton
+        icon="pi pi-file"
+        class="p-button-rounded p-button-outlined p-button-sm"
+        (click)="showLogs()"
+        pTooltip="Mostra logs"
+      ></button>
+
+      <button
+        *ngIf="(item.status === 'downloading' || item.status === 'pending') && item.percentage !== 100"
+        pButton
+        icon="pi pi-trash"
+        class="p-button-rounded p-button-outlined p-button-danger p-button-sm"
+        (click)="cancelDL()"
+        pTooltip="Cancella download"
+      ></button>
+
+      <button
+        *ngIf="item.status === 'downloaded' || item.status === 'cancelled' || item.status === 'error' || item.percentage === 100"
+        pButton
+        icon="pi pi-check"
+        class="p-button-rounded p-button-outlined p-button-sm"
+        (click)="clearCompletedDL()"
+        pTooltip="Rimuovi"
+      ></button>
+    </div>
+  </div>
+</div>

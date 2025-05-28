@@ -1,0 +1,87 @@
+<div class="search-container">
+  <div class="search-form-wrapper">
+    <div class="search-input-group">
+      <!-- Search input field -->
+      <div class="search-field-container">
+        <span class="p-float-label search-field">
+          <input
+            pInputText
+            id="search-input"
+            class="w-full"
+            autocomplete="off"
+            [ngModel]="searchText()"
+            (ngModelChange)="onSearchTextChange($event)"
+          />
+        </span>
+      </div>
+
+      <!-- Search button -->
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-search"
+        label="Cerca"
+        class="search-button"
+        [disabled]="searchInProgress() || searchingServers().length === 0 || searchText() === ''"
+        (click)="onSearch()"
+      ></button>
+    </div>
+
+    <div class="filters-row">
+      <!-- Server selection dropdown -->
+      <div class="server-select-container">
+        <p-dropdown
+          #channelsDropdown
+          [options]="servers()"
+          optionLabel="name"
+          [showClear]="false"
+          placeholder="Server"
+          styleClass="server-select"
+          [disabled]="searchInProgress()"
+          appendTo="body"
+        >
+          <ng-template pTemplate="selectedItem">
+            <div class="server-select-label">
+              <span>
+                {{ searchingServers().length }}
+                {{ searchingServers().length === 1 ? "canale" : "canali" }}
+              </span>
+            </div>
+          </ng-template>
+          <ng-template let-server pTemplate="item">
+            <div class="server-group">
+              <div class="p-2">
+                <strong>{{ server.name }}</strong>
+                @for (channel of server.channels; track channel.channelName) {
+                  <div class="channel-item" (click)="onChannelCheckboxChange(isChannelSelected(channel), channel)">
+                    <p-checkbox
+                      [binary]="true"
+                      [ngModel]="isChannelSelected(channel)"
+                      [inputId]="'channel-' + server.address + '-' + channel.channelName"
+                    ></p-checkbox>
+                    <label [for]="'channel-' + server.address + '-' + channel.channelName" class="ml-2">
+                      {{ channel.channelName }}
+                    </label>
+                  </div>
+                }
+              </div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+
+      <!-- All servers checkbox -->
+      <div class="checkbox-container">
+        <p-checkbox
+          [binary]="true"
+          [(ngModel)]="searchAllServers"
+          (onChange)="onSelectAllServersChange($event)"
+          inputId="all-servers"
+          styleClass="all-servers-checkbox"
+        ></p-checkbox>
+        <label for="all-servers" class="ml-2">Tutti i server</label>
+      </div>
+    </div>
+  </div>
+</div>

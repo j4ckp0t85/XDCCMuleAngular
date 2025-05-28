@@ -1,0 +1,180 @@
+// Grid Layout
+.download-card {
+  padding: 0;
+  box-shadow: 0 2px 1px -1px rgba(0,0,0,.1),
+              0 1px 1px 0 rgba(0,0,0,.07),
+              0 1px 3px 0 rgba(0,0,0,.06);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .card-content {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    padding: 0.5rem;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    padding-right: 0.5rem;
+  }
+
+  .filename {
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    max-height: 2.4rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .tags {
+    margin-bottom: 0.5rem;
+  }
+
+  .info-section {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-color-secondary);
+    margin-top: auto;
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .percentage {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-color);
+      background-color: rgba(59, 130, 246, 0.1);
+      border-radius: 3px;
+      padding: 0 0.25rem;
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-left: 1px solid #e9ecef;
+    padding-left: 0.5rem;
+    justify-content: center;
+  }
+}
+
+// List Layout
+.download-list-item {
+  padding: 0.75rem;
+  background: var(--surface-card);
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  }
+
+  .filename {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .progress-section {
+    flex-shrink: 0;
+  }
+}
+
+// Common styles
+:host ::ng-deep {
+  // Progress Bar styles
+  .p-progressbar {
+    border-radius: 0;
+    background: #e9ecef;
+
+    .p-progressbar-value {
+      border-radius: 0;
+      transition: width 0.4s ease;
+    }
+  }
+
+  // Progress Bar status colors
+  .progress-downloading .p-progressbar-value { background: #3B82F6; }
+  .progress-downloaded .p-progressbar-value { background: #22C55E; }
+  .progress-error .p-progressbar-value { background: #EF4444; }
+  .progress-cancelled .p-progressbar-value { background: #64748B; }
+  .progress-pending .p-progressbar-value { background: #F59E0B; }
+
+  // Knob styles for list view
+  .list-knob .p-knob-text {
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+  }
+  
+  .list-knob .p-knob-value {
+    stroke-width: 6 !important;
+  }
+
+  // Chip styles
+  .p-chip.small-chip {
+    padding: 0 0.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    background: var(--surface-200);
+    color: var(--surface-900);
+
+    .p-chip-text {
+      line-height: 1.5rem;
+    }
+  }
+
+  // Button styles
+  .p-button.p-button-sm {
+    width: 2rem;
+    height: 2rem;
+
+    .p-button-icon {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Responsive adjustments
+@media screen and (max-width: 576px) {
+  .download-card {
+    .card-content {
+      flex-direction: column;
+      padding: 0.25rem;
+    }
+    
+    .main-content {
+      padding-right: 0;
+      margin-bottom: 0.5rem;
+    }
+    
+    .actions {
+      flex-direction: row;
+      border-left: none;
+      border-top: 1px solid #e9ecef;
+      padding-left: 0;
+      padding-top: 0.5rem;
+      justify-content: center;
+    }
+  }
+
+  .download-list-item {
+    padding: 0.5rem;
+  }
+}

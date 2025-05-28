@@ -1,0 +1,52 @@
+// Importa lo stile del titolo della pagina
+@import '../../_shared/styles/page-title';
+
+.table-container {
+  width: 100%;
+  overflow-x: hidden;
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep {
+  .p-datatable {
+    width: 100% !important;
+    
+    .p-datatable-wrapper {
+      overflow-x: hidden !important;
+    }
+    
+    table {
+      width: 100% !important;
+      table-layout: fixed !important;
+    }
+    
+    .name-column {
+      width: 80% !important;
+    }
+    
+    .action-column {
+      width: 20% !important;
+      text-align: center !important;
+    }
+    
+    .name-cell {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+    
+    // Gestione responsive
+    @media screen and (max-width: 768px) {
+      .name-column {
+        width: 70% !important;
+      }
+      
+      .action-column {
+        width: 30% !important;
+      }
+    }
+  }
+}
