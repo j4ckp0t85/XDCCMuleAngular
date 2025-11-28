@@ -20,101 +20,99 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
   styleUrl: './news.component.scss'
 })
 export class NewsComponent {
+  private httpClient = inject(HttpClient);
+  private router = inject(Router);
+  private searchService = inject(SearchService);
+
   news = signal<{ name: string }[]>([]);
   isLoading = signal(true);
-  pageSize = 50;
 
   // Pagination state
-  first = 0;
-  currentPage = 0;
+  first = signal(0);
+  currentPage = signal(0);
+  pageSize = signal(50);
 
   // Displayed data
-  displayedData: { name: string }[] = [];
+  displayedData = signal<{ name: string }[]>([]);
 
-  private searchService!: SearchService;
-
-  constructor(
-      private httpClient: HttpClient,
-      private router: Router
-    ) {
-      this.searchService = inject(SearchService) as SearchService;
-      if (this.searchService.news?.length > 0) {
-        this.news.set(this.searchService.news);
-        this.isLoading.set(false);
-        this.updateDisplayedData();
-      } else {
-        this.fetchNews();
-      }
-
-      effect(() => {
-        this.updateDisplayedData();
-      });
-    }
-
-    updateDisplayedData(): void {
-      const start = this.first;
-      const end = this.first + this.pageSize;
-      this.displayedData = this.news().slice(start, end);
-    }
-
-    fetchNews() {
-      this.httpClient.post(
-        `${API_BASE_URL}/news/`,
-        {
-          newsurl: NEWS_URL,
-          headers: { 'User-Agent': NEWS_USER_AGENT_GRANT },
-        },
-        {
-          responseType: 'text',
-        }
-      )
-      .pipe(catchError(() => {
-        this.isLoading.set(false);
-        return [];
-      }))
-      .subscribe((res) => {
-        if (res === '') return;
-        const splittedRows = res.split('<br>');
-        const results : { name: string}[] = [];
-        splittedRows.forEach((row) => {
-          const split = row.split(' ');
-          results.push({ name: split.slice(3, split.length - 1).join(' ')})
-        });
-        this.news.set(results);
-        this.searchService.news = this.news();
-        this.isLoading.set(false);
-        this.updateDisplayedData();
-      });
-    }
-
-    trackByFn(index: number, item: { name: string }): string {
-      // Usiamo il nome come chiave unica poiché è l'unico campo disponibile
-      // e dovrebbe essere univoco nel contesto delle news
-      return item.name;
-    }
-
-    goHome() {
-      this.router.navigate(['/']);
-    }
-
-    onPageEvent(event: any) {
-      this.first = event.first;
-      this.currentPage = event.page;
-      this.pageSize = event.rows;
+  constructor() {
+    if (this.searchService.news?.length > 0) {
+      this.news.set(this.searchService.news);
+      this.isLoading.set(false);
       this.updateDisplayedData();
+    } else {
+      this.fetchNews();
     }
 
-    doSearch(searchText: string) {
-      // Create navigation extras with state
-      const navigationExtras: NavigationExtras = {
-        state: { searchText }
-      };
+    effect(() => {
+      this.updateDisplayedData();
+    });
+  }
 
-      // Navigate to search page with state
-      this.router.navigate(['/search'], navigationExtras);
+  updateDisplayedData(): void {
+    const start = this.first();
+    const end = this.first() + this.pageSize();
+    this.displayedData.set(this.news().slice(start, end));
+  }
 
-      // Also update the search service directly to ensure data is available
-      // even if the navigation state is lost
-      this.searchService.searchText = searchText;
-    }
+  fetchNews() {
+    this.httpClient.post(
+      `${API_BASE_URL}/news/`,
+      {
+        newsurl: NEWS_URL,
+        headers: { 'User-Agent': NEWS_USER_AGENT_GRANT },
+      },
+      {
+        responseType: 'text',
+      }
+    )
+    .pipe(catchError(() => {
+      this.isLoading.set(false);
+      return [];
+    }))
+    .subscribe((res) => {
+      if (res === '') return;
+      const splittedRows = res.split('<br>');
+      const results : { name: string}[] = [];
+      splittedRows.forEach((row) => {
+        const split = row.split(' ');
+        results.push({ name: split.slice(3, split.length - 1).join(' ')})
+      });
+      this.news.set(results);
+      this.searchService.news = this.news();
+      this.isLoading.set(false);
+      this.updateDisplayedData();
+    });
+  }
+
+  trackByFn(index: number, item: { name: string }): string {
+    // Usiamo il nome come chiave unica poiché è l'unico campo disponibile
+    // e dovrebbe essere univoco nel contesto delle news
+    return item.name;
+  }
+
+  goHome() {
+    this.router.navigate(['/']);
+  }
+
+  onPageEvent(event: any) {
+    this.first.set(event.first);
+    this.currentPage.set(event.page);
+    this.pageSize.set(event.rows);
+    this.updateDisplayedData();
+  }
+
+  doSearch(searchText: string) {
+    // Create navigation extras with state
+    const navigationExtras: NavigationExtras = {
+      state: { searchText }
+    };
+
+    // Navigate to search page with state
+    this.router.navigate(['/search'], navigationExtras);
+
+    // Also update the search service directly to ensure data is available
+    // even if the navigation state is lost
+    this.searchService.searchText = searchText;
+  }
 }

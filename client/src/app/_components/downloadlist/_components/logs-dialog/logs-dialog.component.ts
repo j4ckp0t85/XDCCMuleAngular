@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrimeNgModule } from '../../../../primeng.module';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
@@ -16,14 +16,14 @@ import { catchError, EMPTY, Subscription } from 'rxjs';
   styleUrl: './logs-dialog.component.scss'
 })
 export class LogsDialogComponent implements OnDestroy {
+  private dialogRef = inject(DynamicDialogRef);
+  private config = inject(DynamicDialogConfig);
+  private httpClient = inject(HttpClient);
+
   logs: LogMessageEvent[] = [];
   private subscriptions = new Subscription();
 
-  constructor(
-    private dialogRef: DynamicDialogRef,
-    private config: DynamicDialogConfig,
-    private httpClient: HttpClient
-  ) {
+  constructor() {
     // Recupera i logs dal servizio
     const item = this.config.data?.item as DownloadingFile;
     if (item) {

@@ -16,22 +16,22 @@
   }
 
   <p-paginator
-    [rows]="pageSize"
+    [rows]="pageSize()"
     [totalRecords]="news().length"
     [rowsPerPageOptions]="[15, 30, 50]"
     (onPageChange)="onPageEvent($event)"
     [showFirstLastIcon]="true"
-    [first]="first"
+    [first]="first()"
     class="mt-1 mb-1"
     [hidden]="news().length === 0"
   ></p-paginator>
 
   <div class="table-container">
     <p-table
-      [value]="displayedData"
+      [value]="displayedData()"
       class="news-table"
       [paginator]="false"
-      [rows]="pageSize"
+      [rows]="pageSize()"
       styleClass="p-datatable-striped"
       [tableStyle]="{ 'width': '100%' }"
       responsiveLayout="scroll"

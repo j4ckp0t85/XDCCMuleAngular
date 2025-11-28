@@ -23,14 +23,14 @@
       <div class="flex align-items-center">
         <strong>Totale:</strong> &nbsp;{{ totalFiles() }} download &nbsp;&nbsp;
         <strong>Stato:</strong> &nbsp;
-        <p-dropdown
+        <p-select
           [(ngModel)]="statusFilter"
           [options]="downloadStatusOptions"
           (onChange)="fetchList()"
           [style]="{ width: '130px' }"
           optionLabel="label"
           optionValue="value"
-        ></p-dropdown>
+        ></p-select>
       </div>
       <div class="flex layout-options">
         <button

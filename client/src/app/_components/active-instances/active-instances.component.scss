@@ -1,5 +1,5 @@
 // Importa lo stile del titolo della pagina
-@import '../../_shared/styles/page-title';
+@use '../../_shared/styles/page-title';
 
 // Stile personalizzato per la tabella
 :host ::ng-deep .custom-table {

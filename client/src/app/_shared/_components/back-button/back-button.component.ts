@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
@@ -6,11 +6,11 @@ import { ButtonModule } from 'primeng/button';
   selector: 'app-back-button',
   templateUrl: './back-button.component.html',
   styleUrls: ['./back-button.component.scss'],
+  standalone: true,
   imports: [ButtonModule]
 })
 export class BackButtonComponent {
-
-  constructor(private router: Router) { }
+  private router = inject(Router);
 
   goHome() {
     this.router.navigate(['/']);

@@ -29,16 +29,14 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
     styleUrl: './active-instances.component.scss'
 })
 export class ActiveInstancesComponent implements OnInit, OnDestroy {
+  private router = inject(Router);
+  private httpClient = inject(HttpClient);
+  private messageService = inject(MessageService);
+  
   isFetching = signal(true);
-  activeNetworks!: { network: string }[];
+  activeNetworks = signal<{ network: string }[]>([]);
   subscriptions = new Subscription();
   displayedColumns = ['network', 'action'];
-
-  constructor(
-    private router: Router,
-    private httpClient: HttpClient,
-    private messageService: MessageService
-  ) {}
 
   ngOnInit(): void {
     this.fetchDatas();
@@ -64,12 +62,12 @@ export class ActiveInstancesComponent implements OnInit, OnDestroy {
           return;
         }
         if (list.length === 0) {
-          this.activeNetworks = [];
+          this.activeNetworks.set([]);
           return;
         }
-        this.activeNetworks = list.map((x) => {
+        this.activeNetworks.set(list.map((x) => {
           return { network: x };
-        });
+        }));
       });
     this.subscriptions.add(instancesSub);
   }

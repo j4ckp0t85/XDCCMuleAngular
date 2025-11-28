@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, signal } from '@angular/core';
+import { Component, OnDestroy, signal, inject } from '@angular/core';
 import {
   EMPTY,
   Subscription,
@@ -30,15 +30,15 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
     styleUrl: './reset.component.scss'
 })
 export class ResetComponent implements OnDestroy {
+  private router = inject(Router);
+  private httpClient = inject(HttpClient);
+  private fb = inject(FormBuilder);
+  private messageService = inject(MessageService);
+
   subscriptions = new Subscription();
   confFormGroup: FormGroup;
 
-  constructor(
-    private router: Router,
-    private httpClient: HttpClient,
-    private fb: FormBuilder,
-    private messageService: MessageService
-  ) {
+  constructor() {
     this.confFormGroup = this.fb.group({
       deleteAllJobs: this.fb.control(false),
       closeAllXdccInstances: this.fb.control(false),

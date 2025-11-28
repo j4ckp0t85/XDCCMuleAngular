@@ -18,12 +18,13 @@
       [tableStyle]="{ 'min-width': '50rem' }"
       [paginator]="false"
       [ngClass]="results().length === 0 ? 'invisible' : 'visible'"
-      styleClass="p-datatable-custom"
       [rowTrackBy]="trackByFn"
       [scrollable]="true"
       scrollHeight="flex"
       [frozenColumns]="frozenCols"
       [columns]="cols"
+      [stripedRows]="true"
+      [rowHover]="true"
     >
       <ng-template pTemplate="header" let-columns>
         <tr>

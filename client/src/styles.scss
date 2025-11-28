@@ -4,8 +4,8 @@
 @use './app/_shared/styles/page-title';
 
 // Importa solo PrimeIcons e PrimeFlex
-@import "primeicons/primeicons.css";
-@import "primeflex/primeflex.css";
+@use "primeicons/primeicons.css";
+@use "primeflex/primeflex.css";
 
 // Definizione delle variabili di colore personalizzate
 $primary: #3f51b5;
@@ -20,17 +20,17 @@ $body-bg: #f9f9f9;
 $body-color: #333;
 
 // Personalizzazione dei colori di Bootstrap
-$theme-colors: ("primary": $primary,
+@use 'bootstrap/scss/bootstrap' with (
+  $theme-colors: (
+  "primary": $primary,
   "secondary": $secondary,
   "success": $success,
   "info": $info,
   "warning": $warning,
   "danger": $danger,
   "light": $light,
-  "dark": $dark);
-
-
-@import 'bootstrap/scss/bootstrap';
+  "dark": $dark)
+);
 
 html,
 body {
@@ -55,7 +55,7 @@ body {
     transition: color 0.3s ease;
 
     &:hover {
-      color: darken($primary, 10%);
+      color: color.adjust($primary, $lightness: -10%);
     }
   }
 
@@ -79,7 +79,7 @@ body {
 
     &:hover {
       transform: scale(1.15) rotate(-5deg);
-      background-color: darken($primary, 5%);
+      background-color: color.adjust($primary, $lightness: -5%);
       box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
       border: 2px solid rgba(255, 255, 255, 0.5);
     }
@@ -152,20 +152,6 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .p-datatable-tbody>tr:nth-child(even) {
-    background-color: rgb(211, 211, 211, 0.3);
-    /** Light gray with low opacity **/
-  }
-
-  .p-datatable-tbody>tr:nth-child(odd) {
-    background-color: white;
-  }
-
-  .p-datatable-tbody>tr:hover {
-    background-color: rgba(211, 211, 211, 0.7);
-    /* Light gray with higher opacity on hover */
   }
 
   &.p-datatable-sm {

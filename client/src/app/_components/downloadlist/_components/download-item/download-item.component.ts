@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrimeNgModule } from '../../../../primeng.module';
 import { FormsModule } from '@angular/forms';
@@ -26,14 +26,12 @@ export class DownloadItemComponent implements OnDestroy {
   @Input({ required: true }) item!: DownloadingFile;
   @Input({ required: true }) layout: 'grid' | 'list' = 'grid';
 
-  private subscriptions = new Subscription();
-  private dialogRef: DynamicDialogRef | undefined;
+  private httpClient = inject(HttpClient);
+  private router = inject(Router);
+  private dialogService = inject(DialogService);
 
-  constructor(
-    private httpClient: HttpClient,
-    private router: Router,
-    private dialogService: DialogService
-  ) {}
+  private subscriptions = new Subscription();
+  private dialogRef: DynamicDialogRef | null | undefined;
 
   getProgressColor(item: DownloadingFile): string {
     switch (item.status) {
@@ -83,7 +81,7 @@ export class DownloadItemComponent implements OnDestroy {
       }
     });
 
-    this.dialogRef.onClose.subscribe(() => {
+    this.dialogRef?.onClose.subscribe(() => {
       this.dialogRef = undefined;
     });
   }

@@ -7,10 +7,9 @@ import { Channel } from '../../../_models/channel.interface';
 // PrimeNG imports
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
-import { Dropdown, DropdownModule } from 'primeng/dropdown';
+import { Select, SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TreeModule } from 'primeng/tree';
-import { PrimeNgModule } from '../../../primeng.module';
 
 @Component({
   selector: 'app-search-form',
@@ -20,10 +19,9 @@ import { PrimeNgModule } from '../../../primeng.module';
     FormsModule,
     InputTextModule,
     ButtonModule,
-    DropdownModule,
+    SelectModule,
     CheckboxModule,
     TreeModule,
-    PrimeNgModule,
   ],
   templateUrl: './search-form.component.html',
   styleUrls: ['./search-form.component.scss'],
@@ -45,7 +43,7 @@ export class SearchFormComponent {
 
   // Variabile locale per il checkbox
   searchAllServers = false;
-  channelsDropdown = viewChild<Dropdown>('channelsDropdown');
+  channelsDropdown = viewChild<Select>('channelsDropdown');
 
   constructor() {
     effect(() => {
@@ -146,7 +144,7 @@ export class SearchFormComponent {
       this.searchingServersChange.emit(updatedSelection);
     }
     setTimeout(() => {
-      this.channelsDropdown()!.show();
+      this.channelsDropdown()?.show();
     }, 300);
   }
 }

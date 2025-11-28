@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { KnobModule } from 'primeng/knob';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
@@ -17,7 +17,7 @@ import { ToastModule } from 'primeng/toast';
   exports: [
     ButtonModule,
     ChipModule,
-    DropdownModule,
+    SelectModule,
     KnobModule,
     ProgressBarModule,
     TooltipModule,

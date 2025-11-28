@@ -65,14 +65,13 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   private flatList: { server: string; channel: string; id: number }[] = [];
   private subscriptions = new Subscription();
+  private injector = inject(Injector);
+  private httpClient = inject(HttpClient);
+  private router = inject(Router);
+  private searchService = inject(SearchService);
   private dbServiceServer = inject(DBServerService);
 
-  constructor(
-    private injector: Injector,
-    private httpClient: HttpClient,
-    private router: Router,
-    private searchService: SearchService
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.initializeFromRouterState();
