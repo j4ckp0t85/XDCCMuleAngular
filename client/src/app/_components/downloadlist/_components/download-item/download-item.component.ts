@@ -1,6 +1,10 @@
-import { Component, Input, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject, ChangeDetectionStrategy, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PrimeNgModule } from '../../../../primeng.module';
+import { ButtonModule } from 'primeng/button';
+import { ChipModule } from 'primeng/chip';
+import { KnobModule } from 'primeng/knob';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { DownloadableFile, DownloadingFile } from '../../../../_models/downloadingfile.interface';
 import { HttpClient } from '@angular/common/http';
@@ -12,19 +16,23 @@ import { LogsDialogComponent } from '../logs-dialog/logs-dialog.component';
 
 @Component({
   selector: 'app-download-item',
-  standalone: true,
   imports: [
     CommonModule,
-    PrimeNgModule,
+    ButtonModule,
+    ChipModule,
+    KnobModule,
+    ProgressBarModule,
+    TooltipModule,
     FormsModule
   ],
   templateUrl: './download-item.component.html',
   styleUrl: './download-item.component.scss',
-  providers: [DialogService]
+  providers: [DialogService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DownloadItemComponent implements OnDestroy {
-  @Input({ required: true }) item!: DownloadingFile;
-  @Input({ required: true }) layout: 'grid' | 'list' = 'grid';
+  item = input.required<DownloadingFile>();
+  layout = input.required<'grid' | 'list'>();
 
   private httpClient = inject(HttpClient);
   private router = inject(Router);
@@ -53,18 +61,19 @@ export class DownloadItemComponent implements OnDestroy {
   }
 
   retryDL() {
+    const item = this.item();
     const payload: DownloadableFile = {
-      network: this.item.network,
-      channelName: this.item.channelName,
-      botName: this.item.botName,
-      fileNumber: this.item.fileNumber,
-      fileName: this.item.fileName,
-      fileSize: this.item.fileSize
+      network: item.network,
+      channelName: item.channelName,
+      botName: item.botName,
+      fileNumber: item.fileNumber,
+      fileName: item.fileName,
+      fileSize: item.fileSize
     }
     const retrySub = this.httpClient
       .post(`${API_BASE_URL}/download`, payload)
       .subscribe(() => {
-        this.item.status = 'pending';
+        item.status = 'pending';
       });
     this.subscriptions.add(retrySub);
   }
@@ -72,12 +81,12 @@ export class DownloadItemComponent implements OnDestroy {
   showLogs() {
     // Implementazione con PrimeNG Dialog
     this.dialogRef = this.dialogService.open(LogsDialogComponent, {
-      header: 'Logs per ' + this.item.fileName,
+      header: 'Logs per ' + this.item().fileName,
       width: '70%',
       contentStyle: { "max-height": "500px", "overflow": "auto" },
       baseZIndex: 10000,
       data: {
-        item: this.item
+        item: this.item()
       }
     });
 
@@ -87,30 +96,32 @@ export class DownloadItemComponent implements OnDestroy {
   }
 
   cancelDL() {
+    const item = this.item();
     const payload: DownloadableFile = {
-      network: this.item.network,
-      channelName: this.item.channelName,
-      botName: this.item.botName,
-      fileNumber: this.item.fileNumber,
-      fileName: this.item.fileName,
-      fileSize: this.item.fileSize
+      network: item.network,
+      channelName: item.channelName,
+      botName: item.botName,
+      fileNumber: item.fileNumber,
+      fileName: item.fileName,
+      fileSize: item.fileSize
     }
     const cancelSub = this.httpClient
       .post(`${API_BASE_URL}/cancel`, payload)
       .subscribe(() => {
-        this.item.status = 'cancelled';
+        item.status = 'cancelled';
       });
     this.subscriptions.add(cancelSub);
   }
 
   clearCompletedDL() {
+    const item = this.item();
     const payload: DownloadableFile = {
-      network: this.item.network,
-      channelName: this.item.channelName,
-      botName: this.item.botName,
-      fileNumber: this.item.fileNumber,
-      fileName: this.item.fileName,
-      fileSize: this.item.fileSize
+      network: item.network,
+      channelName: item.channelName,
+      botName: item.botName,
+      fileNumber: item.fileNumber,
+      fileName: item.fileName,
+      fileSize: item.fileSize
     }
     const clearSub = this.httpClient
       .post(`${API_BASE_URL}/clearcompleted`, payload)

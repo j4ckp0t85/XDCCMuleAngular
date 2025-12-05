@@ -17,25 +17,28 @@ import {
 import { CommonModule } from '@angular/common';
 import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
-import { PrimeNgModule } from '../../primeng.module';
+import { SelectModule } from 'primeng/select';
+import { PaginatorModule } from 'primeng/paginator';
+import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { DownloadItemComponent } from './_components/download-item/download-item.component';
 import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
 import { MessageService } from 'primeng/api';
 
 @Component({
-    selector: 'app-downloadlist',
-    standalone: true,
-    imports: [
-        CommonModule,
-        PrimeNgModule,
-        FormsModule,
-        DownloadItemComponent,
-        BackButtonComponent
-    ],
-    templateUrl: './downloadlist.component.html',
-    styleUrl: './downloadlist.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-downloadlist',
+  imports: [
+    CommonModule,
+    SelectModule,
+    PaginatorModule,
+    ButtonModule,
+    FormsModule,
+    DownloadItemComponent,
+    BackButtonComponent
+  ],
+  templateUrl: './downloadlist.component.html',
+  styleUrl: './downloadlist.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DownloadlistComponent implements OnInit, OnDestroy {
   private readonly LAYOUT_STORAGE_KEY = 'downloadlist-layout';
@@ -76,7 +79,7 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
 
   private actualSubscription!: Subscription | undefined;
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Load layout preference from localStorage

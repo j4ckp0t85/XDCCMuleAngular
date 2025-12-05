@@ -1,14 +1,16 @@
-import { Component, effect, input, output } from '@angular/core';
+import { Component, effect, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Result } from '../../../_models/result.interface';
-import { PrimeNgModule } from '../../../primeng.module';
+import { TableModule } from 'primeng/table';
+import { PaginatorModule } from 'primeng/paginator';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-search-results',
-  standalone: true,
-  imports: [CommonModule, PrimeNgModule],
+  imports: [CommonModule, TableModule, PaginatorModule, ButtonModule],
   templateUrl: './search-results.component.html',
-  styleUrls: ['./search-results.component.scss']
+  styleUrls: ['./search-results.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchResultsComponent {
   // Inputs

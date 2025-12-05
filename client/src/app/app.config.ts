@@ -1,10 +1,7 @@
 import { ApplicationConfig, isDevMode, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideServiceWorker } from '@angular/service-worker';
-import { environment } from '../environments/environment';
-import { provideHttpClient } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { definePreset } from '@primeng/themes';
@@ -14,8 +11,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     MessageService,
     provideRouter(routes),
-    provideAnimationsAsync(),
-    provideHttpClient(),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

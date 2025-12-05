@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, signal, inject } from '@angular/core';
+import { Component, OnDestroy, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
   EMPTY,
   Subscription,
@@ -12,22 +12,24 @@ import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PrimeNgModule } from '../../primeng.module';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
 
 @Component({
-    selector: 'app-reset',
-    standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        PrimeNgModule,
-        BackButtonComponent
-    ],
-    templateUrl: './reset.component.html',
-    styleUrl: './reset.component.scss'
+  selector: 'app-reset',
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    CheckboxModule,
+    ButtonModule,
+    BackButtonComponent
+  ],
+  templateUrl: './reset.component.html',
+  styleUrl: './reset.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResetComponent implements OnDestroy {
   private router = inject(Router);

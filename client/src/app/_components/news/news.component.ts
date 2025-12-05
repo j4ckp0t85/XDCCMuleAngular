@@ -1,23 +1,27 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras } from '@angular/router';
 import { API_BASE_URL, NEWS_URL, NEWS_USER_AGENT_GRANT } from '../../_shared/config';
 import { catchError } from 'rxjs';
 import { SearchService } from '../../_shared/_services/search-inmemory.service';
-import { PrimeNgModule } from '../../primeng.module';
+import { PaginatorModule } from 'primeng/paginator';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
 
 @Component({
   selector: 'app-news',
-  standalone: true,
   imports: [
-       CommonModule,
-       PrimeNgModule,
-       BackButtonComponent
-    ],
+    CommonModule,
+    PaginatorModule,
+    ButtonModule,
+    TableModule,
+    BackButtonComponent
+  ],
   templateUrl: './news.component.html',
-  styleUrl: './news.component.scss'
+  styleUrl: './news.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewsComponent {
   private httpClient = inject(HttpClient);
@@ -66,23 +70,23 @@ export class NewsComponent {
         responseType: 'text',
       }
     )
-    .pipe(catchError(() => {
-      this.isLoading.set(false);
-      return [];
-    }))
-    .subscribe((res) => {
-      if (res === '') return;
-      const splittedRows = res.split('<br>');
-      const results : { name: string}[] = [];
-      splittedRows.forEach((row) => {
-        const split = row.split(' ');
-        results.push({ name: split.slice(3, split.length - 1).join(' ')})
+      .pipe(catchError(() => {
+        this.isLoading.set(false);
+        return [];
+      }))
+      .subscribe((res) => {
+        if (res === '') return;
+        const splittedRows = res.split('<br>');
+        const results: { name: string }[] = [];
+        splittedRows.forEach((row) => {
+          const split = row.split(' ');
+          results.push({ name: split.slice(3, split.length - 1).join(' ') })
+        });
+        this.news.set(results);
+        this.searchService.news = this.news();
+        this.isLoading.set(false);
+        this.updateDisplayedData();
       });
-      this.news.set(results);
-      this.searchService.news = this.news();
-      this.isLoading.set(false);
-      this.updateDisplayedData();
-    });
   }
 
   trackByFn(index: number, item: { name: string }): string {
@@ -116,3 +120,4 @@ export class NewsComponent {
     this.searchService.searchText = searchText;
   }
 }
+

@@ -1,6 +1,6 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PrimeNgModule } from '../../../../primeng.module';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { HttpClient } from '@angular/common/http';
 import { DownloadingFile } from '../../../../_models/downloadingfile.interface';
@@ -10,10 +10,10 @@ import { catchError, EMPTY, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-logs-dialog',
-  standalone: true,
-  imports: [CommonModule, PrimeNgModule],
+  imports: [CommonModule, ScrollPanelModule],
   templateUrl: './logs-dialog.component.html',
-  styleUrl: './logs-dialog.component.scss'
+  styleUrl: './logs-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LogsDialogComponent implements OnDestroy {
   private dialogRef = inject(DynamicDialogRef);
@@ -40,10 +40,10 @@ export class LogsDialogComponent implements OnDestroy {
       filename: item.fileName,
       filesize: item.fileSize,
     })
-    .pipe(catchError(() => EMPTY))
-    .subscribe(response => {
-      this.logs = response || [];
-    });
+      .pipe(catchError(() => EMPTY))
+      .subscribe(response => {
+        this.logs = response || [];
+      });
   }
 
   close() {

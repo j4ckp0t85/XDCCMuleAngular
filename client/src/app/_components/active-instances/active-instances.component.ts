@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   EMPTY,
   Subscription,
@@ -12,27 +12,29 @@ import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PrimeNgModule } from '../../primeng.module';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
 
 @Component({
-    selector: 'app-active-instances',
-    standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        PrimeNgModule,
-        BackButtonComponent
-    ],
-    templateUrl: './active-instances.component.html',
-    styleUrl: './active-instances.component.scss'
+  selector: 'app-active-instances',
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    BackButtonComponent
+  ],
+  templateUrl: './active-instances.component.html',
+  styleUrl: './active-instances.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ActiveInstancesComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private httpClient = inject(HttpClient);
   private messageService = inject(MessageService);
-  
+
   isFetching = signal(true);
   activeNetworks = signal<{ network: string }[]>([]);
   subscriptions = new Subscription();
