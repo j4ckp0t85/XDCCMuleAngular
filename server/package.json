@@ -20,7 +20,7 @@
     "is-online": "8.5.1",
     "js": "^0.1.0",
     "tsup": "^8.0.2",
-    "xdccjs": "file:xdccjs-5.4.0.tgz"
+    "xdccjs": "file:xdccjs-5.6.0.tgz"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
