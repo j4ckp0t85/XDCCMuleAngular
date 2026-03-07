@@ -1,5 +1,4 @@
-import { Component, effect, input, output, viewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, effect, input, output, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Server } from '../../../_models/server.interface';
 import { Channel } from '../../../_models/channel.interface';
@@ -8,14 +7,12 @@ import { Channel } from '../../../_models/channel.interface';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { Select, SelectModule } from 'primeng/select';
-import { CheckboxModule } from 'primeng/checkbox';
+import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { TreeModule } from 'primeng/tree';
 
 @Component({
   selector: 'app-search-form',
-  standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     InputTextModule,
     ButtonModule,
@@ -24,36 +21,32 @@ import { TreeModule } from 'primeng/tree';
     TreeModule,
   ],
   templateUrl: './search-form.component.html',
-  styleUrls: ['./search-form.component.scss'],
+  styleUrl: './search-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent {
   // Inputs
-  servers = input<Server[]>([]);
-  searchText = input('');
-  searchingServers = input<Channel[]>([]);
-  searchOnAllServers = input(false);
-  searchInProgress = input(false);
+  readonly servers = input<Server[]>([]);
+  readonly searchText = input('');
+  readonly searchingServers = input<Channel[]>([]);
+  readonly searchOnAllServers = input(false);
+  readonly searchInProgress = input(false);
 
   // Outputs
-  searchTextChange = output<string>();
-  searchingServersChange = output<Channel[]>();
-  searchOnAllServersChange = output<boolean>();
-  search = output<void>();
-  serverGroupClick = output<Server>();
+  readonly searchTextChange = output<string>();
+  readonly searchingServersChange = output<Channel[]>();
+  readonly searchOnAllServersChange = output<boolean>();
+  readonly search = output<void>();
+  readonly serverGroupClick = output<Server>();
 
-  // Variabile locale per il checkbox
+  // Local var for p-checkbox two-way binding (synced via in-class effect)
   searchAllServers = false;
-  channelsDropdown = viewChild<Select>('channelsDropdown');
+  readonly channelsDropdown = viewChild<Select>('channelsDropdown');
 
-  constructor() {
-    effect(() => {
-      // Aggiorna il valore locale solo quando il signal cambia
-      const newValue = this.searchOnAllServers();
-      if (this.searchAllServers !== newValue) {
-        this.searchAllServers = newValue;
-      }
-    });
-  }
+  // Sync local var when signal changes (Angular 21 in-class effect)
+  private readonly _syncAllServers = effect(() => {
+    this.searchAllServers = this.searchOnAllServers();
+  });
 
   /**
    * Update search text and emit change
@@ -84,10 +77,10 @@ export class SearchFormComponent {
   /**
    * Handle "select all servers" checkbox change
    */
-  onSelectAllServersChange(event: any): void {
+  onSelectAllServersChange(event: CheckboxChangeEvent): void {
     if (!event) return;
 
-    this.searchOnAllServersChange.emit(event.checked);
+    this.searchOnAllServersChange.emit(!!event.checked);
 
     const allChannels =
       event.checked && this.servers()

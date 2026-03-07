@@ -10,7 +10,6 @@ import {
 } from 'rxjs';
 import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -20,7 +19,6 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
 @Component({
   selector: 'app-active-instances',
   imports: [
-    CommonModule,
     FormsModule,
     TableModule,
     ButtonModule,
@@ -31,14 +29,14 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ActiveInstancesComponent implements OnInit, OnDestroy {
-  private router = inject(Router);
-  private httpClient = inject(HttpClient);
-  private messageService = inject(MessageService);
+  private readonly router = inject(Router);
+  private readonly httpClient = inject(HttpClient);
+  private readonly messageService = inject(MessageService);
 
-  isFetching = signal(true);
-  activeNetworks = signal<{ network: string }[]>([]);
-  subscriptions = new Subscription();
-  displayedColumns = ['network', 'action'];
+  readonly isFetching = signal(true);
+  readonly activeNetworks = signal<{ network: string }[]>([]);
+  private readonly subscriptions = new Subscription();
+  readonly displayedColumns = ['network', 'action'];
 
   ngOnInit(): void {
     this.fetchDatas();

@@ -1,15 +1,16 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
+import { ThemeService } from './_shared/_services/theme.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, ToastModule],
+  imports: [RouterOutlet, ToastModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  title = 'xdcc-angular';
+  readonly title = 'xdcc-angular';
+  private readonly themeService = inject(ThemeService);
 }

@@ -1,8 +1,8 @@
 {
   "name": "xdccAngular",
   "short_name": "xdccAngular",
-  "theme_color": "#1976d2",
-  "background_color": "#fafafa",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
   "display": "fullscreen",
   "scope": "./",
   "start_url": "./",

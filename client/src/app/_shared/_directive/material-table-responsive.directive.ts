@@ -4,6 +4,7 @@ import {
   ElementRef,
   OnDestroy,
   Renderer2,
+  inject,
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
@@ -12,7 +13,10 @@ import { map, takeUntil } from 'rxjs/operators';
   selector: '[matTableResponsive]'
 })
 export class MatTableResponsiveDirective implements AfterViewInit, OnDestroy {
-  private onDestroy$ = new Subject<boolean>();
+  private readonly table = inject(ElementRef);
+  private readonly renderer = inject(Renderer2);
+
+  private readonly onDestroy$ = new Subject<boolean>();
 
   private thead!: HTMLTableSectionElement;
   private tbody!: HTMLTableSectionElement;
@@ -27,7 +31,7 @@ export class MatTableResponsiveDirective implements AfterViewInit, OnDestroy {
     this.tbodyChanged$.next(true)
   );
 
-  constructor(private table: ElementRef, private renderer: Renderer2) {}
+
 
   ngAfterViewInit() {
     this.thead = this.table.nativeElement.querySelector('thead');

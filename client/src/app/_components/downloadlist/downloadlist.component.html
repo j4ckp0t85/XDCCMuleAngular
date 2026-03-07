@@ -1,54 +1,31 @@
 <app-back-button></app-back-button>
 
-<div class="page">
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex align-items-center">
-        <h2 class="page-title mb-0">Download</h2>
+<div class="page fade-in">
+  <!-- Header with title and actions -->
+  <div class="page-header">
+    <h2 class="page-title mb-0">Download</h2>
+    <div class="header-actions">
+      <div class="status-pills">
+        <span class="stat-pill">
+          <i class="pi pi-folder"></i>
+          <strong>{{ totalFiles() }}</strong> download
+        </span>
+        <div class="status-select-wrapper">
+          <p-select [(ngModel)]="statusFilter" [options]="downloadStatusOptions" (onChange)="fetchList()"
+            [style]="{ width: '140px' }" optionLabel="label" optionValue="value"></p-select>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="w-100 flex align-items-center justify-content-between mb-3">
-    <div>
-      <button 
-        pButton 
-        type="button" 
-        label="Pulisci i download" 
-        icon="pi pi-trash" 
-        class="p-button-danger" 
-        (click)="cleanDownloads()"
-      ></button>
-    </div>
-    <div class="flex align-items-center gap-3">
-      <div class="flex align-items-center">
-        <strong>Totale:</strong> &nbsp;{{ totalFiles() }} download &nbsp;&nbsp;
-        <strong>Stato:</strong> &nbsp;
-        <p-select
-          [(ngModel)]="statusFilter"
-          [options]="downloadStatusOptions"
-          (onChange)="fetchList()"
-          [style]="{ width: '130px' }"
-          optionLabel="label"
-          optionValue="value"
-        ></p-select>
-      </div>
-      <div class="flex layout-options">
-        <button
-          type="button"
-          class="layout-btn grid-btn"
-          [class.active]="layout === 'grid'"
-          (click)="setLayout('grid')"
-        >
-          <i class="pi pi-th-large"></i>
-        </button>
-        <button
-          type="button"
-          class="layout-btn list-btn"
-          [class.active]="layout === 'list'"
-          (click)="setLayout('list')"
-        >
-          <i class="pi pi-bars"></i>
-        </button>
+      <div class="action-row">
+        <button pButton type="button" label="Pulisci" icon="pi pi-trash" class="clean-btn"
+          (click)="cleanDownloads()"></button>
+        <div class="layout-switch">
+          <button type="button" class="layout-btn" [class.active]="layout === 'grid'" (click)="setLayout('grid')">
+            <i class="pi pi-th-large"></i>
+          </button>
+          <button type="button" class="layout-btn" [class.active]="layout === 'list'" (click)="setLayout('list')">
+            <i class="pi pi-bars"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -57,10 +34,7 @@
   <div class="grid">
     @for (item of displayedData(); track getItemTrackKey(0, item)) {
     <div class="col-12 sm:col-6 lg:col-4 xl:col-3 p-2">
-      <app-download-item
-        [item]="item"
-        [layout]="'grid'"
-      ></app-download-item>
+      <app-download-item [item]="item" [layout]="'grid'"></app-download-item>
     </div>
     }
   </div>
@@ -68,27 +42,22 @@
   <div class="list">
     @for (item of displayedData(); track getItemTrackKey(0, item)) {
     <div class="mb-2">
-      <app-download-item
-        [item]="item"
-        [layout]="'list'"
-      ></app-download-item>
+      <app-download-item [item]="item" [layout]="'list'"></app-download-item>
     </div>
     }
   </div>
   }
 
-  <p-paginator
-    [rows]="pageSize"
-    [totalRecords]="totalFiles()"
-    [rowsPerPageOptions]="[12, 24, 36]"
-    (onPageChange)="onPageEvent($event)"
-    [showFirstLastIcon]="true"
-    [first]="first"
-    class="mt-3"
-    [ngClass]="totalFiles() === 0 ? 'invisible' : 'visible'"
-  ></p-paginator>
+  <p-paginator [rows]="pageSize()" [totalRecords]="totalFiles()" [rowsPerPageOptions]="[12, 24, 36]"
+    (onPageChange)="onPageEvent($event)" [showFirstLastIcon]="true" [first]="first()" class="mt-3"
+    [class.invisible]="totalFiles() === 0" [class.visible]="totalFiles() > 0"></p-paginator>
 
   @if (totalFiles() === 0) {
-  <div class="p-4 text-center">Nessun download disponibile.</div>
+  <div class="empty-state">
+    <div class="empty-icon">
+      <i class="pi pi-inbox"></i>
+    </div>
+    <p>Nessun download disponibile</p>
+  </div>
   }
 </div>

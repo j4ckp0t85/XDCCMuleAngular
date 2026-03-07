@@ -8,16 +8,18 @@
     [showFirstLastIcon]="true"
     [first]="first"
     class="mt-1 mb-1"
-    [ngClass]="results().length === 0 ? 'invisible' : 'visible'"
+    [class.invisible]="results().length === 0"
+    [class.visible]="results().length > 0"
   ></p-paginator>
 
   <!-- Results Table -->
   <div class="results">
     <p-table
-      [value]="displayedData"
+      [value]="displayedData()"
       [tableStyle]="{ 'min-width': '50rem' }"
       [paginator]="false"
-      [ngClass]="results().length === 0 ? 'invisible' : 'visible'"
+      [class.invisible]="results().length === 0"
+      [class.visible]="results().length > 0"
       [rowTrackBy]="trackByFn"
       [scrollable]="true"
       scrollHeight="flex"
@@ -28,38 +30,36 @@
     >
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th *ngFor="let col of frozenCols" pFrozenColumn>
-            {{ col.header }}
-          </th>
-          <th *ngFor="let col of columns">
-            {{ col.header }}
-          </th>
+          @for (col of frozenCols; track col.field) {
+            <th pFrozenColumn>{{ col.header }}</th>
+          }
+          @for (col of columns; track col.field) {
+            <th>{{ col.header }}</th>
+          }
           <th pFrozenColumn alignFrozen="right">Azione</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-element let-columns="columns">
         <tr>
-          <td *ngFor="let col of frozenCols" pFrozenColumn>
-            {{ element[col.field] }}
-          </td>
-          <td *ngFor="let col of columns">
-            {{ element[col.field] }}
-          </td>
+          @for (col of frozenCols; track col.field) {
+            <td pFrozenColumn>{{ element[col.field] }}</td>
+          }
+          @for (col of columns; track col.field) {
+            <td>{{ element[col.field] }}</td>
+          }
           <td pFrozenColumn alignFrozen="right">
             <button
               pButton
               icon="pi pi-download"
               class="p-button-rounded p-button-primary download-button"
-              (click)="
-                onDownload(
-                  element.server,
-                  element.channel,
-                  element.bot,
-                  element.package,
-                  element.filename,
-                  element.filesize
-                )
-              "
+              (click)="onDownload(
+                element.server,
+                element.channel,
+                element.bot,
+                element.package,
+                element.filename,
+                element.filesize
+              )"
             ></button>
           </td>
         </tr>

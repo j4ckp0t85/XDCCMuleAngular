@@ -1,38 +1,32 @@
-import { ResetComponent } from './_components/reset/reset.component';
 import { Routes } from '@angular/router';
-import { SearchComponent } from './_components/search/search.component';
-import { HomeComponent } from './_components/home/home.component';
-import { DownloadlistComponent } from './_components/downloadlist/downloadlist.component';
-import { ActiveInstancesComponent } from './_components/active-instances/active-instances.component';
-import { NewsComponent } from './_components/news/news.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
+    loadComponent: () => import('./_components/home/home.component').then(m => m.HomeComponent),
   },
   {
     path: 'search',
-    component: SearchComponent,
+    loadComponent: () => import('./_components/search/search.component').then(m => m.SearchComponent),
   },
   {
     path: 'downloads',
-    component: DownloadlistComponent,
+    loadComponent: () => import('./_components/downloadlist/downloadlist.component').then(m => m.DownloadlistComponent),
   },
   {
     path: 'instances',
-    component: ActiveInstancesComponent,
+    loadComponent: () => import('./_components/active-instances/active-instances.component').then(m => m.ActiveInstancesComponent),
   },
   {
     path: 'reset',
-    component: ResetComponent,
+    loadComponent: () => import('./_components/reset/reset.component').then(m => m.ResetComponent),
   },
   {
     path: 'news',
-    component: NewsComponent,
+    loadComponent: () => import('./_components/news/news.component').then(m => m.NewsComponent),
   },
   {
     path: '**',
-    component: HomeComponent,
+    redirectTo: '',
   },
 ];

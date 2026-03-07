@@ -1,45 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { ThemeService } from '../../_shared/_services/theme.service';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [RouterModule, CommonModule, NgOptimizedImage],
+  imports: [RouterModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent {
-  items = [
-    {
-      title: 'Cerca',
-      icon: 'search',
-      link: '/search',
-      description: 'Cerca file su tutti i server disponibili'
-    },
+  readonly themeBase = inject(ThemeService);
+  readonly dockItems = [
     {
       title: 'Downloads',
       icon: 'download',
-      link: '/downloads',
-      description: 'Gestisci i tuoi download'
+      link: '/downloads'
     },
     {
-      title: 'Istanze attive',
-      icon: 'hashtag',
-      link: '/instances',
-      description: 'Visualizza e gestisci le istanze attive'
+      title: 'Istanze Server',
+      icon: 'server',
+      link: '/instances'
     },
     {
-      title: 'Reset',
-      icon: 'eraser',
-      link: '/reset',
-      description: 'Reimposta le impostazioni'
+      title: 'Aggiornamenti',
+      icon: 'bolt',
+      link: '/news'
     },
     {
-      title: 'News',
-      icon: 'receipt',
-      link: '/news',
-      description: 'Scopri le ultime novità e aggiornamenti'
+      title: 'Impostazioni',
+      icon: 'cog',
+      link: '/reset'
     }
   ];
 }

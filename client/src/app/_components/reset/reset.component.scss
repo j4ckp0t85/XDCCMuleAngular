@@ -1,8 +1,49 @@
-// Importa lo stile del titolo della pagina
 @use '../../_shared/styles/page-title';
 
 form {
 	display: flex;
 	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.mt-3 {
+	background: var(--bg-surface);
+	backdrop-filter: blur(40px);
+	-webkit-backdrop-filter: blur(40px);
+	border: 1px solid var(--border-subtle);
+	border-radius: var(--radius-lg);
+	padding: 2.5rem 2rem;
+	box-shadow: var(--shadow-glass);
+	max-width: 520px;
+}
+
+label {
+	color: var(--text-pure);
+	font-size: 1rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: color 0.3s ease;
+
+	&:hover {
+		color: var(--accent-base);
+	}
+}
+
+// Checkbox grid wrapper if needed (PrimeNG structure uses classes implicitly)
+.field-checkbox {
+	display: flex;
+	align-items: center;
 	gap: 1rem;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid var(--border-subtle);
+
+	&:last-of-type {
+		border-bottom: none;
+		margin-bottom: 1rem;
+	}
+}
+
+button[pButton] {
+	width: 100%;
+	margin-top: 1rem;
 }

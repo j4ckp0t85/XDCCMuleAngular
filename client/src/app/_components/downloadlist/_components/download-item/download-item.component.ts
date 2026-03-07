@@ -1,5 +1,4 @@
 import { Component, OnDestroy, inject, ChangeDetectionStrategy, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
 import { KnobModule } from 'primeng/knob';
@@ -17,7 +16,6 @@ import { LogsDialogComponent } from '../logs-dialog/logs-dialog.component';
 @Component({
   selector: 'app-download-item',
   imports: [
-    CommonModule,
     ButtonModule,
     ChipModule,
     KnobModule,
@@ -31,14 +29,14 @@ import { LogsDialogComponent } from '../logs-dialog/logs-dialog.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DownloadItemComponent implements OnDestroy {
-  item = input.required<DownloadingFile>();
-  layout = input.required<'grid' | 'list'>();
+  readonly item = input.required<DownloadingFile>();
+  readonly layout = input.required<'grid' | 'list'>();
 
-  private httpClient = inject(HttpClient);
-  private router = inject(Router);
-  private dialogService = inject(DialogService);
+  private readonly httpClient = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly dialogService = inject(DialogService);
 
-  private subscriptions = new Subscription();
+  private readonly subscriptions = new Subscription();
   private dialogRef: DynamicDialogRef | null | undefined;
 
   getProgressColor(item: DownloadingFile): string {

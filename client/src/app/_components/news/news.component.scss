@@ -1,52 +1,69 @@
-// Importa lo stile del titolo della pagina
 @use '../../_shared/styles/page-title';
 
 .table-container {
   width: 100%;
   overflow-x: hidden;
-  background: white;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--bg-surface);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.5rem;
+  box-shadow: var(--shadow-glass);
+}
+
+h3 {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 1.5rem;
 }
 
 :host ::ng-deep {
   .p-datatable {
     width: 100% !important;
-    
+
     .p-datatable-wrapper {
       overflow-x: hidden !important;
     }
-    
+
     table {
       width: 100% !important;
       table-layout: fixed !important;
     }
-    
+
     .name-column {
       width: 80% !important;
     }
-    
+
     .action-column {
       width: 20% !important;
-      text-align: center !important;
+      text-align: right !important;
     }
-    
+
     .name-cell {
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       white-space: nowrap !important;
+      font-weight: 500;
     }
-    
-    // Gestione responsive
+
     @media screen and (max-width: 768px) {
       .name-column {
         width: 70% !important;
       }
-      
+
       .action-column {
         width: 30% !important;
       }
     }
+  }
+
+  // Capsule buttons for quit
+  .p-button-sm {
+    padding: 0.5rem 1.25rem !important;
+    border-radius: var(--radius-pill) !important;
   }
 }

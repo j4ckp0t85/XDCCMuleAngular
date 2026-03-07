@@ -1,11 +1,10 @@
-import { Component, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras } from '@angular/router';
 import { API_BASE_URL, NEWS_URL, NEWS_USER_AGENT_GRANT } from '../../_shared/config';
 import { catchError } from 'rxjs';
 import { SearchService } from '../../_shared/_services/search-inmemory.service';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
@@ -13,7 +12,6 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
 @Component({
   selector: 'app-news',
   imports: [
-    CommonModule,
     PaginatorModule,
     ButtonModule,
     TableModule,
@@ -24,42 +22,35 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewsComponent {
-  private httpClient = inject(HttpClient);
-  private router = inject(Router);
-  private searchService = inject(SearchService);
+  private readonly httpClient = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly searchService = inject(SearchService);
 
-  news = signal<{ name: string }[]>([]);
-  isLoading = signal(true);
+  readonly news = signal<{ name: string }[]>([]);
+  readonly isLoading = signal(true);
 
   // Pagination state
-  first = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(50);
+  readonly first = signal(0);
+  readonly currentPage = signal(0);
+  readonly pageSize = signal(50);
 
-  // Displayed data
-  displayedData = signal<{ name: string }[]>([]);
+  // Displayed data as computed signal (reacts automatically to news/pagination changes)
+  readonly displayedData = computed(() => {
+    const start = this.first();
+    const end = this.first() + this.pageSize();
+    return this.news().slice(start, end);
+  });
 
   constructor() {
     if (this.searchService.news?.length > 0) {
       this.news.set(this.searchService.news);
       this.isLoading.set(false);
-      this.updateDisplayedData();
     } else {
       this.fetchNews();
     }
-
-    effect(() => {
-      this.updateDisplayedData();
-    });
   }
 
-  updateDisplayedData(): void {
-    const start = this.first();
-    const end = this.first() + this.pageSize();
-    this.displayedData.set(this.news().slice(start, end));
-  }
-
-  fetchNews() {
+  fetchNews(): void {
     this.httpClient.post(
       `${API_BASE_URL}/news/`,
       {
@@ -80,44 +71,33 @@ export class NewsComponent {
         const results: { name: string }[] = [];
         splittedRows.forEach((row) => {
           const split = row.split(' ');
-          results.push({ name: split.slice(3, split.length - 1).join(' ') })
+          results.push({ name: split.slice(3, split.length - 1).join(' ') });
         });
         this.news.set(results);
         this.searchService.news = this.news();
         this.isLoading.set(false);
-        this.updateDisplayedData();
       });
   }
 
   trackByFn(index: number, item: { name: string }): string {
-    // Usiamo il nome come chiave unica poiché è l'unico campo disponibile
-    // e dovrebbe essere univoco nel contesto delle news
     return item.name;
   }
 
-  goHome() {
+  goHome(): void {
     this.router.navigate(['/']);
   }
 
-  onPageEvent(event: any) {
-    this.first.set(event.first);
-    this.currentPage.set(event.page);
-    this.pageSize.set(event.rows);
-    this.updateDisplayedData();
+  onPageEvent(event: PaginatorState): void {
+    this.first.set(event.first ?? 0);
+    this.currentPage.set(event.page ?? 0);
+    this.pageSize.set(event.rows ?? this.pageSize());
   }
 
-  doSearch(searchText: string) {
-    // Create navigation extras with state
+  doSearch(searchText: string): void {
     const navigationExtras: NavigationExtras = {
       state: { searchText }
     };
-
-    // Navigate to search page with state
     this.router.navigate(['/search'], navigationExtras);
-
-    // Also update the search service directly to ensure data is available
-    // even if the navigation state is lost
     this.searchService.searchText = searchText;
   }
 }
-

@@ -7,158 +7,413 @@
 @use "primeicons/primeicons.css";
 @use "primeflex/primeflex.css";
 
-// Definizione delle variabili di colore personalizzate
-$primary: #3f51b5;
-$secondary: #ff4081;
-$success: #4caf50;
-$info: #2196f3;
-$warning: #ff9800;
-$danger: #f44336;
-$light: #f5f5f5;
-$dark: #212121;
-$body-bg: #f9f9f9;
-$body-color: #333;
+// ── Bootstrap overrides ─────────────────────────────────
+$primary: #f43f5e;
+$secondary: #8b5cf6;
+$success: #10b981;
+$info: #0ea5e9;
+$warning: #f59e0b;
+$danger: #ef4444;
+$light: #f8fafc;
+$dark: #020617;
 
-// Personalizzazione dei colori di Bootstrap
-@use 'bootstrap/scss/bootstrap' with (
-  $theme-colors: (
-  "primary": $primary,
-  "secondary": $secondary,
-  "success": $success,
-  "info": $info,
-  "warning": $warning,
-  "danger": $danger,
-  "light": $light,
-  "dark": $dark)
-);
+@use 'bootstrap/scss/bootstrap' with ($theme-colors: ("primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark ));
 
-html,
-body {
-  height: 100%;
-  background-color: $body-bg;
+// ── Design Tokens (Ultra-Modern Dark Pattern) ──────────
+:root {
+  /* BACKGROUNDS */
+  --bg-screen: #030305;
+  --bg-surface: rgba(255, 255, 255, 0.02);
+  --bg-surface-hover: rgba(255, 255, 255, 0.04);
+  --bg-surface-active: rgba(255, 255, 255, 0.06);
+
+  /* BORDERS */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  /* TYPOGRAPHY */
+  --text-pure: #ffffff;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
+
+  /* ACCENTS (Neon Rose to Electric Purple) */
+  --accent-base: #f43f5e;
+  --accent-secondary: #8b5cf6;
+  --gradient-accent: linear-gradient(135deg, #f43f5e 0%, #8b5cf6 100%);
+  --glow-accent: rgba(244, 63, 94, 0.3);
+  --glow-secondary: rgba(139, 92, 246, 0.2);
+
+  /* RADII */
+  --radius-xs: 6px;
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --radius-pill: 9999px;
+
+  /* SHADOWS & GLASS */
+  --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  --drop-glow: drop-shadow(0 0 15px var(--glow-accent));
+
+  color-scheme: dark;
 }
 
+/* Fallback for OS Light without explicit .dark-mode class */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark-mode) {
+    --bg-screen: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-hover: #f1f5f9;
+    --bg-surface-active: #e2e8f0;
+
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-strong: rgba(0, 0, 0, 0.2);
+
+    --text-pure: #0f172a;
+    --text-muted: #64748b;
+    --text-dim: #cbd5e1;
+
+    --glow-accent: rgba(244, 63, 94, 0.2);
+    --glow-secondary: rgba(139, 92, 246, 0.15);
+
+    --shadow-glass: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+    color-scheme: light;
+  }
+}
+
+/* Explicit Light Mode */
+:root.light-mode {
+  --bg-screen: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f1f5f9;
+  --bg-surface-active: #e2e8f0;
+
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.2);
+
+  --text-pure: #0f172a;
+  --text-muted: #64748b;
+  --text-dim: #cbd5e1;
+
+  --glow-accent: rgba(244, 63, 94, 0.2);
+  --glow-secondary: rgba(139, 92, 246, 0.15);
+
+  --shadow-glass: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+  color-scheme: light;
+}
+
+/* Explicit Dark Mode */
+:root.dark-mode {
+  --bg-screen: #030305;
+  --bg-surface: rgba(255, 255, 255, 0.02);
+  --bg-surface-hover: rgba(255, 255, 255, 0.04);
+  --bg-surface-active: rgba(255, 255, 255, 0.06);
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  --text-pure: #ffffff;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
+
+  --glow-accent: rgba(244, 63, 94, 0.3);
+  --glow-secondary: rgba(139, 92, 246, 0.2);
+
+  --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+// ── Global Base ─────────────────────────────────────────
 body {
+  background-color: var(--bg-screen);
+  /* Ambient glowing orbs via CSS background */
+  background-image:
+    radial-gradient(circle at 15% 0%, var(--glow-accent), transparent 40%),
+    radial-gradient(circle at 85% 100%, var(--glow-secondary), transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-pure);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
   margin: 0;
-  padding: 15px 45px;
-  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  font-weight: 300 !important;
-  color: $body-color;
+  -webkit-font-smoothing: antialiased;
+}
 
-  @media (max-width: 768px) {
-    padding: 10px 20px;
+a {
+  color: var(--accent-base);
+  text-decoration: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
   }
+}
 
-  a {
-    text-decoration: none;
-    color: $primary;
-    transition: color 0.3s ease;
+/* Page Constraints */
+.page {
+  max-width: 1400px;
+  /* Really wide for modern screens */
+  margin: 0 auto;
+  padding: 3rem 2rem;
+
+  @media (max-width: 1024px) {
+    padding: 5rem 1rem 2rem;
+  }
+}
+
+// ── Glass & Bento Utilities ─────────────────────────────
+.glass-panel {
+  background: var(--bg-surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glass);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+// ── Buttons Overhaul ────────────────────────────────────
+.p-button {
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  border-radius: var(--radius-pill) !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: none !important;
+
+  &:not(.p-button-outlined):not(.p-button-text):not(.p-button-link) {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-strong) !important;
+    color: var(--text-pure) !important;
+    backdrop-filter: blur(10px);
 
     &:hover {
-      color: color.adjust($primary, $lightness: -10%);
-    }
-  }
-
-  button.back-nav-btn {
-    position: fixed;
-    top: 17px;
-    left: 15px;
-    padding: 0;
-    z-index: 100;
-    color: white;
-    background-color: $primary;
-    border-radius: 50%;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 2px solid transparent;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      transform: scale(1.15) rotate(-5deg);
-      background-color: color.adjust($primary, $lightness: -5%);
-      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
-      border: 2px solid rgba(255, 255, 255, 0.5);
+      background: var(--text-pure) !important;
+      color: var(--bg-screen) !important;
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
     }
 
     &:active {
-      transform: scale(0.95);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transform: scale(0.98);
     }
   }
 
-  @media (max-width: 600px) {
-    button.back-nav-btn {
-      left: 5px;
+  &.p-button-primary {
+    background: var(--gradient-accent) !important;
+    color: #fff !important;
+    border: none !important;
+
+    &:hover {
+      box-shadow: 0 8px 25px var(--glow-accent) !important;
     }
   }
 
-  div.page {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 2rem 15px 0;
+  &.p-button-danger {
+    background: var(--bg-surface) !important;
+    border: 1px solid #ef4444 !important;
+    color: #ef4444 !important;
 
-    @media (max-width: 767.98px) {
-      padding-top: 4rem;
-    }
-
-    @media (min-width: 992px) {
-      // max-width: 90%;
-    }
-
-    @media (min-width: 1200px) {
-      max-width: 80%;
+    &:hover {
+      background: #ef4444 !important;
+      color: #fff !important;
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4) !important;
     }
   }
 }
 
+// ── Back Navigation (Ultra-Modern Island) ───────────────
+button.back-nav-btn {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 100;
+  height: 48px;
+  padding: 0;
+  width: 48px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: var(--bg-surface);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-pure);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-glass);
+  overflow: hidden;
 
-// Animazioni
-@keyframes fadeIn {
+  // The pseudo-element for text to create the "expanding" effect
+  &::after {
+    content: 'Indietro';
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  i.pi {
+    font-size: 1.1rem;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover {
+    width: 130px; // Expands into a pill
+    background: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    padding: 0 1rem;
+    gap: 0.5rem;
+    transform: translateY(-2px);
+
+    i.pi {
+      color: var(--accent-base);
+    }
+
+    &::after {
+      opacity: 1;
+      width: 60px;
+      visibility: visible;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    top: 1rem;
+    left: 1rem;
+    height: 44px;
+    width: 44px;
+
+    &:hover {
+      width: 44px; // disable expansion on mobile
+      padding: 0;
+      gap: 0;
+
+      &::after {
+        display: none;
+      }
+    }
+  }
+}
+
+// ── Inputs & PrimeNG Overrides ──────────────────────────
+:host ::ng-deep {
+
+  .p-inputtext,
+  .p-dropdown,
+  .p-select {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid var(--border-strong) !important;
+    border-radius: 0 !important;
+    color: var(--text-pure) !important;
+    padding: 0.75rem 0.5rem !important;
+    transition: all 0.3s ease !important;
+    font-size: 1.1rem !important;
+    box-shadow: none !important;
+
+    &:focus,
+    &.p-focus {
+      border-bottom-color: var(--accent-base) !important;
+      background: var(--bg-surface-hover) !important;
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+
+  .p-dropdown-panel {
+    background: var(--bg-screen) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-md) !important;
+    backdrop-filter: blur(30px);
+  }
+
+  .p-datatable-thead>tr>th {
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 1rem 0.5rem !important;
+  }
+
+  .p-datatable-tbody>tr {
+    background: transparent !important;
+    color: var(--text-pure) !important;
+
+    &>td {
+      border-bottom: 1px solid var(--border-subtle) !important;
+      padding: 1rem 0.5rem !important;
+    }
+
+    &:hover {
+      background: var(--bg-surface-hover) !important;
+    }
+  }
+
+  .p-toast-message {
+    background: var(--bg-screen) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--text-pure) !important;
+    box-shadow: var(--shadow-glass) !important;
+  }
+}
+
+// ── Custom Scrollbar ────────────────────────────────────
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-pill);
+
+  &:hover {
+    background: var(--text-muted);
+  }
+}
+
+// ── Fade In ─────────────────────────────────────────────
+@keyframes smoothFade {
   from {
     opacity: 0;
+    transform: translateY(15px) scale(0.99);
   }
 
   to {
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
 .fade-in {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: smoothFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-
-.p-paginator {
-  background: transparent;
-  border: none;
-  padding: 0.5rem 0;
-}
-
-.p-datatable {
-  .p-datatable-thead>tr>th {
-    padding: 0.75rem 0.5rem;
-    font-weight: 400;
-    background-color: #673ab7;
-    /* Deep Purple */
-    color: white;
-  }
-
-  .p-datatable-tbody>tr>td {
-    padding: 0.5rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &.p-datatable-sm {
-
-    .p-datatable-thead>tr>th,
-    .p-datatable-tbody>tr>td {
-      padding: 0.3rem 0.5rem;
-    }
-  }
+// Utility text
+.text-muted {
+  color: var(--text-muted) !important;
 }

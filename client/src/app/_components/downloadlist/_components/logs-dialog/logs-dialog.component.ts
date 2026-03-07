@@ -1,5 +1,4 @@
 import { Component, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { HttpClient } from '@angular/common/http';
@@ -10,18 +9,18 @@ import { catchError, EMPTY, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-logs-dialog',
-  imports: [CommonModule, ScrollPanelModule],
+  imports: [ScrollPanelModule],
   templateUrl: './logs-dialog.component.html',
   styleUrl: './logs-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LogsDialogComponent implements OnDestroy {
-  private dialogRef = inject(DynamicDialogRef);
-  private config = inject(DynamicDialogConfig);
-  private httpClient = inject(HttpClient);
+  private readonly dialogRef = inject(DynamicDialogRef);
+  private readonly config = inject(DynamicDialogConfig);
+  private readonly httpClient = inject(HttpClient);
 
   logs: LogMessageEvent[] = [];
-  private subscriptions = new Subscription();
+  private readonly subscriptions = new Subscription();
 
   constructor() {
     // Recupera i logs dal servizio

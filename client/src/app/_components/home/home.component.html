@@ -1,45 +1,55 @@
-<div class="home-container fade-in">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-10 col-lg-8">
-        <div class="card shadow-lg border-0">
-          <div class="card-body p-4 p-md-5">
-            <div class="text-center mb-4">
-              <div class="d-flex align-items-center justify-content-center mb-3">
-                <h2 class="app-title me-3 mb-0">XDCCMuleAngular</h2>
-                <img ngSrc="assets/logo.png" alt="XDCCMuleAngular logo" width="40" height="40" class="logo-img" />
-              </div>
-              <p class="text-muted">Il tuo client XDCC moderno e intuitivo</p>
-            </div>
+<div class="spatial-container fade-in">
+  <!-- Glowing Ambient Mesh behind -->
+  <div class="aurora-bg">
+    <div class="aurora-1"></div>
+    <div class="aurora-2"></div>
+    <div class="aurora-3"></div>
+  </div>
 
-            <div class="divider mb-4"></div>
+  <!-- Top Bar -->
+  <nav class="spatial-top-bar">
+    <div class="brand">
+      <span class="logo-text">XDCC<span class="neo-accent">Mule</span></span>
+      <span class="badge">v3.0.0</span>
+    </div>
+    <button class="theme-toggle-btn" (click)="themeBase.toggleTheme()" aria-label="Toggle Theme"
+      [title]="'Tema attuale: ' + themeBase.currentTheme()">
+      <i class="pi"
+        [class.pi-moon]="themeBase.currentTheme() === 'dark' || (themeBase.currentTheme() === 'system' && themeBase.isDarkActive())"
+        [class.pi-sun]="themeBase.currentTheme() === 'light' || (themeBase.currentTheme() === 'system' && !themeBase.isDarkActive())"></i>
+    </button>
+  </nav>
 
-            <div class="menu-options">
-              <div class="row g-4">
-                @for (item of items; track item.title) {
-                <div class="col-md-6">
-                  <a [routerLink]="item.link" class="menu-item-link">
-                    <div class="menu-item d-flex align-items-center p-3 rounded">
-                      <div class="icon-container me-3 d-flex align-items-center justify-content-center">
-                        <i [class]="'pi pi-' + item.icon"></i>
-                      </div>
-                      <div>
-                        <h5 class="mb-1">{{ item.title }}</h5>
-                        <p class="mb-0 text-muted small">{{ item.description }}</p>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                }
-              </div>
-            </div>
+  <!-- Central Command -->
+  <main class="command-center">
+    <div class="welcome-label">
+      <span class="pulse-dot"></span>
+      Rete XDCC Globale
+    </div>
 
-            <div class="text-center mt-5">
-              <p class="small text-muted">© 2025 XDCCMuleAngular - Versione 3.0.0</p>
-            </div>
-          </div>
-        </div>
+    <h1 class="main-title">Trova il tuo prossimo file.</h1>
+    <p class="subtitle">Ricerca fulminea. Download diretto. Nessuna coda.</p>
+
+    <a routerLink="/search" class="giant-search-trigger">
+      <i class="pi pi-search search-icon"></i>
+      <span class="placeholder-text">Cerca tra milioni di pacchetti, film, serie, musica...</span>
+      <div class="kbd-wrap">
+        <span class="kbd">Go</span>
       </div>
+    </a>
+  </main>
+
+  <!-- Spatial Dock -->
+  <div class="spatial-dock-wrapper">
+    <div class="spatial-dock">
+      @for (item of dockItems; track item.link) {
+      <a [routerLink]="item.link" class="dock-item" [title]="item.title">
+        <div class="dock-icon-wrapper">
+          <i [class]="'pi pi-' + item.icon"></i>
+        </div>
+        <span class="dock-tooltip">{{ item.title }}</span>
+      </a>
+      }
     </div>
   </div>
 </div>

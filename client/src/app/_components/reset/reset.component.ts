@@ -10,7 +10,6 @@ import {
 } from 'rxjs';
 import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
@@ -20,7 +19,6 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
 @Component({
   selector: 'app-reset',
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     CheckboxModule,
@@ -32,13 +30,13 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResetComponent implements OnDestroy {
-  private router = inject(Router);
-  private httpClient = inject(HttpClient);
-  private fb = inject(FormBuilder);
-  private messageService = inject(MessageService);
+  private readonly router = inject(Router);
+  private readonly httpClient = inject(HttpClient);
+  private readonly fb = inject(FormBuilder);
+  private readonly messageService = inject(MessageService);
 
-  subscriptions = new Subscription();
-  confFormGroup: FormGroup;
+  private readonly subscriptions = new Subscription();
+  readonly confFormGroup: FormGroup;
 
   constructor() {
     this.confFormGroup = this.fb.group({

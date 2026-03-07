@@ -14,11 +14,10 @@ import {
   DownloadingFile,
   StatusOption,
 } from '../../_models/downloadingfile.interface';
-import { CommonModule } from '@angular/common';
 import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
 import { SelectModule } from 'primeng/select';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { DownloadItemComponent } from './_components/download-item/download-item.component';
@@ -28,7 +27,6 @@ import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-downloadlist',
   imports: [
-    CommonModule,
     SelectModule,
     PaginatorModule,
     ButtonModule,
@@ -43,9 +41,9 @@ import { MessageService } from 'primeng/api';
 export class DownloadlistComponent implements OnInit, OnDestroy {
   private readonly LAYOUT_STORAGE_KEY = 'downloadlist-layout';
 
-  downloadList = signal<DownloadingFile[]>([]);
+  readonly downloadList = signal<DownloadingFile[]>([]);
   statusFilter: StatusOption = 'all';
-  downloadStatusOptions = [
+  readonly downloadStatusOptions = [
     { label: 'Tutti', value: 'all' },
     { label: 'In attesa', value: 'pending' },
     { label: 'In download', value: 'downloading' },
@@ -53,7 +51,7 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
     { label: 'Errore', value: 'error' },
     { label: 'Cancellati', value: 'cancelled' },
   ];
-  totalFiles = linkedSignal({
+  readonly totalFiles = linkedSignal({
     source: this.downloadList,
     computation: (downloadList: DownloadingFile[]) => downloadList.length,
   });
@@ -61,25 +59,24 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
   // Layout state
   layout: 'grid' | 'list' = this.loadLayoutPreference();
 
-  // Pagination state
-  first = 0;
-  pageSize = 12;
+  // Pagination state as signals for computed() compatibility
+  readonly first = signal(0);
+  readonly pageSize = signal(12);
 
-  // Displayed data based on pagination
-  displayedData = computed(() => {
-    const start = this.first;
-    const end = this.first + this.pageSize;
+  // Displayed data as computed signal
+  readonly displayedData = computed(() => {
+    const start = this.first();
+    const end = this.first() + this.pageSize();
     return this.downloadList().slice(start, end);
   });
 
-  private subscriptions = new Subscription();
-  private httpClient = inject(HttpClient);
-  private router = inject(Router);
-  private messageService = inject(MessageService);
+  private readonly subscriptions = new Subscription();
+  private readonly httpClient = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly messageService = inject(MessageService);
 
   private actualSubscription!: Subscription | undefined;
 
-  constructor() { }
 
   /**
    * Load layout preference from localStorage
@@ -284,12 +281,12 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
     }
 
     // Reset pagination
-    this.first = 0;
+    this.first.set(0);
   }
 
-  onPageEvent(event: any): void {
-    this.first = event.first;
-    this.pageSize = event.rows;
+  onPageEvent(event: PaginatorState): void {
+    this.first.set(event.first ?? 0);
+    this.pageSize.set(event.rows ?? this.pageSize());
   }
 
   ngOnInit(): void {
@@ -297,7 +294,7 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
     this.fetchList();
   }
 
-  goHome() {
+  goHome(): void {
     this.router.navigate(['/']);
   }
 

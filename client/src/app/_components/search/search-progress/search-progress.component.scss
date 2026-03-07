@@ -1,4 +1,13 @@
-/* Stili per la barra di progresso */
+/* Progress bar styled with gradient accent */
 ::ng-deep .p-progressbar {
   height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+
+  .p-progressbar-value {
+    background: var(--gradient-accent);
+    border-radius: 3px;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
 }

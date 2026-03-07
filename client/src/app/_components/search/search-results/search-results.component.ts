@@ -1,25 +1,25 @@
-import { Component, effect, input, output, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
 import { Result } from '../../../_models/result.interface';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
+import { PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-search-results',
-  imports: [CommonModule, TableModule, PaginatorModule, ButtonModule],
+  imports: [TableModule, PaginatorModule, ButtonModule],
   templateUrl: './search-results.component.html',
-  styleUrls: ['./search-results.component.scss'],
+  styleUrl: './search-results.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchResultsComponent {
   // Inputs
-  results = input<Result[]>([]);
-  pageSize = input(50);
+  readonly results = input<Result[]>([]);
+  readonly pageSize = input(50);
 
   // Outputs
-  pageSizeChange = output<number>();
-  downloadRequest = output<{
+  readonly pageSizeChange = output<number>();
+  readonly downloadRequest = output<{
     server: string;
     channel: string;
     bot: string;
@@ -32,48 +32,36 @@ export class SearchResultsComponent {
   first = 0;
   currentPage = 0;
 
-  // Displayed data
-  displayedData: Result[] = [];
+  // Displayed data as computed signal
+  readonly displayedData = computed(() => {
+    const start = this.first;
+    const end = this.first + this.pageSize();
+    return this.results().slice(start, end);
+  });
 
-  // Definizione delle colonne
-  frozenCols = [
+  // Column definitions
+  readonly frozenCols = [
     { field: 'server', header: 'Server' },
     { field: 'channel', header: 'Canale' }
   ];
 
-  cols = [
+  readonly cols = [
     { field: 'package', header: 'Package' },
     { field: 'bot', header: 'Bot' },
     { field: 'filesize', header: 'Dimensione' },
     { field: 'filename', header: 'Nome file' },
   ];
 
-  constructor() {
-    effect(() => {
-      // Update displayed data whenever results or pagination changes
-      this.updateDisplayedData();
-    });
-  }
-
-  updateDisplayedData(): void {
-    const start = this.first;
-    const end = this.first + this.pageSize();
-    this.displayedData = this.results().slice(start, end);
-  }
-
-  onPageEvent(event: any): void {
-    this.first = event.first;
-    this.currentPage = event.page;
+  onPageEvent(event: PaginatorState): void {
+    this.first = event.first ?? 0;
+    this.currentPage = event.page ?? 0;
 
     if (event.rows !== this.pageSize()) {
-      this.pageSizeChange.emit(event.rows);
+      this.pageSizeChange.emit(event.rows ?? this.pageSize());
     }
-
-    this.updateDisplayedData();
   }
 
   trackByFn(index: number, item: Result): string {
-    // Creiamo una chiave unica combinando i campi che identificano univocamente un risultato
     return `${item.server}-${item.channel}-${item.bot}-${item.package}`;
   }
 

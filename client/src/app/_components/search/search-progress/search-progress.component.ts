@@ -1,18 +1,16 @@
-import { Component, computed, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 
 @Component({
   selector: 'app-search-progress',
-  standalone: true,
-  imports: [CommonModule, ProgressBarModule],
+  imports: [ProgressBarModule],
   templateUrl: './search-progress.component.html',
-  styleUrls: ['./search-progress.component.scss']
+  styleUrl: './search-progress.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchProgressComponent {
-  percentageDone = input(0);
-  isVisible = input(false);
-  
-  // Percentuale arrotondata senza decimali
-  roundedPercentage = computed(() => Math.round(this.percentageDone()));
+  readonly percentageDone = input(0);
+  readonly isVisible = input(false);
+
+  readonly roundedPercentage = computed(() => Math.round(this.percentageDone()));
 }

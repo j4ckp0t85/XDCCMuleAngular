@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import {
   Component,
+  ChangeDetectionStrategy,
   Injector,
   OnDestroy,
   OnInit,
-  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -17,7 +17,6 @@ import {
   mergeMap,
   tap,
 } from 'rxjs';
-import { CommonModule } from '@angular/common';
 import { Result } from '../../_models/result.interface';
 import { Router } from '@angular/router';
 import { API_BASE_URL } from '../../_shared/config';
@@ -35,9 +34,7 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
 
 @Component({
   selector: 'app-search',
-  standalone: true,
   imports: [
-    CommonModule,
     SearchFormComponent,
     SearchProgressComponent,
     SearchResultsComponent,
@@ -46,32 +43,32 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
     BackButtonComponent
   ],
   templateUrl: './search.component.html',
-  styleUrl: './search.component.scss'
+  styleUrl: './search.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchComponent implements OnInit, OnDestroy {
   // UI state
-  percentageDone = signal(0);
-  searchInProgress = signal(false);
-  searchText = signal('');
-  searchOnAllServers = signal(false);
-  pageSize = signal(50);
+  readonly percentageDone = signal(0);
+  readonly searchInProgress = signal(false);
+  readonly searchText = signal('');
+  readonly searchOnAllServers = signal(false);
+  readonly pageSize = signal(50);
 
   // Results data
-  results = signal<Result[]>([]);
+  readonly results = signal<Result[]>([]);
 
   // Server data
-  servers = signal<Server[]>([]);
-  searchingServers = signal<Channel[]>([]);
+  readonly servers = signal<Server[]>([]);
+  readonly searchingServers = signal<Channel[]>([]);
 
   private flatList: { server: string; channel: string; id: number }[] = [];
-  private subscriptions = new Subscription();
-  private injector = inject(Injector);
-  private httpClient = inject(HttpClient);
-  private router = inject(Router);
-  private searchService = inject(SearchService);
-  private dbServiceServer = inject(DBServerService);
+  private readonly subscriptions = new Subscription();
+  private readonly injector = inject(Injector);
+  private readonly httpClient = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly searchService = inject(SearchService);
+  private readonly dbServiceServer = inject(DBServerService);
 
-  constructor() {}
 
   ngOnInit(): void {
     this.initializeFromRouterState();
@@ -163,7 +160,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         const channel = this.searchingServers()[index];
         const flatEntry = this.flatList.find(
           (fe) => fe.channel === channel.channelName &&
-                  fe.server === channel.serverAddress
+            fe.server === channel.serverAddress
         );
 
         return this.parseSearchResults(value, flatEntry);
@@ -342,8 +339,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   goHome(): void {
     this.router.navigate(['/']);
   }
-
-
   /**
    * Initiate file download
    */
