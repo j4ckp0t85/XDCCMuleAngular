@@ -14,14 +14,57 @@ export const jobsMap = new Map<string, Job>();
 
 export const downloadsMap = new Map<string, DownloadingFile>();
 
-getSavedDownloads().forEach((download) =>
-  downloadsMap.set(buildJobKey(download), download)
-);
+let needsSave = false;
+getSavedDownloads().forEach((download) => {
+  const key = buildJobKey(download);
+  
+  // Verifica file 'downloaded' incompleti
+  if (download.status === 'downloaded' && (download.percentage !== 100 || download.errorMessage)) {
+    console.log(`[Download] File incompleto rilevato al bootstrap: ${download.fileName}`);
+    download.status = 'error';
+    if (!download.errorMessage) {
+      download.errorMessage = 'File incompleto';
+    }
+    needsSave = true;
+  }
+  
+  downloadsMap.set(key, download);
+  console.log(`[Download] Caricato: ${download.fileName} - Status: ${download.status}${download.errorMessage ? ' - Error: ' + download.errorMessage : ''}`);
+});
 
 const isSameFile = (fileInfo: FileInfo, fileToDownload: DownloadableFile) =>
   fileInfo.file === fileToDownload.fileName;
 
-export const statuses = () => new Array(...downloadsMap.values());
+export const statuses = () => {
+  const downloads = Array.from(downloadsMap.values());
+  const seen = new Map<string, DownloadingFile>();
+  
+  for (const dl of downloads) {
+    const existing = seen.get(dl.fileName);
+    if (!existing) {
+      seen.set(dl.fileName, dl);
+    } else {
+      // Priorità: downloading > pending > error > downloaded > cancelled
+      const priority = (status: string) => {
+        if (status === 'downloading') return 5;
+        if (status === 'pending') return 4;
+        if (status === 'error') return 3;
+        if (status === 'downloaded') return 2;
+        return 1;
+      };
+      if (priority(dl.status) > priority(existing.status)) {
+        seen.set(dl.fileName, dl);
+      }
+    }
+  }
+  
+  return Array.from(seen.values());
+};
+
+// Salva le modifiche fatte al bootstrap
+if (needsSave) {
+  saveDownloads();
+}
 
 export const startdl = async (
   xdccMapEntry: XDCCMapEntry | undefined,
@@ -123,6 +166,7 @@ export const download = function (fileToDownload: DownloadableFile) {
         xdccMapEntry.conf,
         fileToDownload.channelName
       );
+      // xdccJsInstancesMap.set(fileToDownload.network, xdccMapEntry);
     }
     startdl(xdccMapEntry, fileToDownload);
   }

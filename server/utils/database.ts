@@ -49,7 +49,11 @@ export const saveDownloads = (clearAll = false) => {
           download.status !== 'downloaded' && download.status !== 'cancelled'
       )
     : statuses();
-  fs.writeFile(DOWNLOADS_FILE_KEY, JSON.stringify(downloads), () => {});
+  try {
+    fs.writeFileSync(DOWNLOADS_FILE_KEY, JSON.stringify(downloads, null, 2));
+  } catch (e) {
+    console.error('[Database] Errore salvataggio downloads:', e);
+  }
 };
 
 export const getSavedDownloads = () => {
@@ -68,5 +72,9 @@ export const markAllAsError = () => {
   downloads.forEach((download) => {
     download.status = 'error';
   });
-  fs.writeFile(DOWNLOADS_FILE_KEY, JSON.stringify(downloads), () => {});
+  try {
+    fs.writeFileSync(DOWNLOADS_FILE_KEY, JSON.stringify(downloads, null, 2));
+  } catch (e) {
+    console.error('[Database] Errore markAllAsError:', e);
+  }
 };

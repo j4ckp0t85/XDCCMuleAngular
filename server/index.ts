@@ -12,6 +12,7 @@ import { instances, quitInstance } from './utils/network';
 
 import { reset } from './utils/reset';
 import { DEFAULT_SERVERS } from './utils/config';
+import { startErrorMonitoring } from './utils/monitor';
 import { DownloadableFile, ResetRequest } from './models';
 
 dotenv.config();
@@ -196,4 +197,5 @@ const credentials = {
 const httpsServer = https.createServer(credentials, app);
 httpsServer.listen(8443, () => {
   console.log('Server listening on port 8443');
+  startErrorMonitoring();
 });
