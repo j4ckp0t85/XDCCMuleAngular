@@ -35,6 +35,7 @@
           #channelsDropdown
           [options]="servers()"
           optionLabel="name"
+          dataKey="id"
           [showClear]="false"
           placeholder="Server"
           styleClass="server-select"
@@ -53,14 +54,14 @@
             <div class="server-group">
               <div class="p-2">
                 <strong>{{ server.name }}</strong>
-                @for (channel of server.channels; track channel.channelName) {
+                @for (channel of server.channels; track $index) {
                   <div class="channel-item" (click)="onChannelCheckboxChange(isChannelSelected(channel), channel)">
                     <p-checkbox
                       [binary]="true"
                       [ngModel]="isChannelSelected(channel)"
-                      [inputId]="'channel-' + server.address + '-' + channel.channelName"
+                      [inputId]="'channel-' + server.address + '-' + channel.channelName + '-' + $index"
                     ></p-checkbox>
-                    <label [for]="'channel-' + server.address + '-' + channel.channelName" class="ml-2">
+                    <label [for]="'channel-' + server.address + '-' + channel.channelName + '-' + $index" class="ml-2">
                       {{ channel.channelName }}
                     </label>
                   </div>

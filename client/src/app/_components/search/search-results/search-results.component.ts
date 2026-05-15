@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, input, output, signal, effect, untracked } from '@angular/core';
 import { Result } from '../../../_models/result.interface';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
@@ -29,15 +29,26 @@ export class SearchResultsComponent {
   }>();
 
   // Pagination state
-  first = 0;
-  currentPage = 0;
+  readonly first = signal(0);
+  readonly currentPage = signal(0);
 
   // Displayed data as computed signal
   readonly displayedData = computed(() => {
-    const start = this.first;
-    const end = this.first + this.pageSize();
+    const start = this.first();
+    const end = this.first() + this.pageSize();
     return this.results().slice(start, end);
   });
+
+  constructor() {
+    // Reset pagination when results change
+    effect(() => {
+      this.results();
+      untracked(() => {
+        this.first.set(0);
+        this.currentPage.set(0);
+      });
+    });
+  }
 
   // Column definitions
   readonly frozenCols = [
@@ -53,8 +64,8 @@ export class SearchResultsComponent {
   ];
 
   onPageEvent(event: PaginatorState): void {
-    this.first = event.first ?? 0;
-    this.currentPage = event.page ?? 0;
+    this.first.set(event.first ?? 0);
+    this.currentPage.set(event.page ?? 0);
 
     if (event.rows !== this.pageSize()) {
       this.pageSizeChange.emit(event.rows ?? this.pageSize());

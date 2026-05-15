@@ -6,7 +6,7 @@
     [rowsPerPageOptions]="[15, 30, 50]"
     (onPageChange)="onPageEvent($event)"
     [showFirstLastIcon]="true"
-    [first]="first"
+    [first]="first()"
     class="mt-1 mb-1"
     [class.invisible]="results().length === 0"
     [class.visible]="results().length > 0"

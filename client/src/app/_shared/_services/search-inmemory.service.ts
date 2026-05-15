@@ -12,7 +12,7 @@ export class SearchService {
   private _searchResults!: Result[];
   private _searchingServers!: Channel[];
   private _pageSize!: number;
-  private _news!: { name: string }[];
+  private _news!: { id: number; name: string }[];
 
   get pageSize(): number {
     return this._pageSize;
@@ -34,7 +34,7 @@ export class SearchService {
     return this._searchingServers;
   }
 
-  get news(): { name: string }[] {
+  get news(): { id: number; name: string }[] {
     return this._news;
   }
 
@@ -58,7 +58,7 @@ export class SearchService {
     this._searchingServers = value;
   }
 
-  set news(value: { name: string }[]) {
+  set news(value: { id: number; name: string }[]) {
     this._news = value;
   }
 }

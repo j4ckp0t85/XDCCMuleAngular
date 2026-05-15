@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@a
 import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras } from '@angular/router';
 import { API_BASE_URL, NEWS_URL, NEWS_USER_AGENT_GRANT } from '../../_shared/config';
+import { parsePickle } from '../../_shared/pickle-parser';
 import { catchError } from 'rxjs';
 import { SearchService } from '../../_shared/_services/search-inmemory.service';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
@@ -26,7 +27,7 @@ export class NewsComponent {
   private readonly router = inject(Router);
   private readonly searchService = inject(SearchService);
 
-  readonly news = signal<{ name: string }[]>([]);
+  readonly news = signal<{ id: number; name: string }[]>([]);
   readonly isLoading = signal(true);
 
   // Pagination state
@@ -66,21 +67,37 @@ export class NewsComponent {
         return [];
       }))
       .subscribe((res) => {
-        if (res === '') return;
-        const splittedRows = res.split('<br>');
-        const results: { name: string }[] = [];
-        splittedRows.forEach((row) => {
-          const split = row.split(' ');
-          results.push({ name: split.slice(3, split.length - 1).join(' ') });
-        });
-        this.news.set(results);
-        this.searchService.news = this.news();
-        this.isLoading.set(false);
+        try {
+          if (!res) return;
+          
+          const parsed = parsePickle(res);
+          if (!parsed) return;
+
+          const results: { id: number; name: string }[] = [];
+          let idCounter = 0;
+          // The parsed object is a dictionary with categories as keys and list of names as values
+          Object.values(parsed).forEach((itemList: any) => {
+            if (Array.isArray(itemList)) {
+              itemList.forEach((value: string) => {
+                const words = value.split(' ');
+                const cleanedName = words.length > 1 ? words.slice(0, -1).join(' ') : value;
+                results.push({ id: idCounter++, name: cleanedName });
+              });
+            }
+          });
+          
+          this.news.set(results);
+          this.searchService.news = this.news();
+        } catch (error) {
+          console.error('Error parsing news pickle:', error);
+        } finally {
+          this.isLoading.set(false);
+        }
       });
   }
 
-  trackByFn(index: number, item: { name: string }): string {
-    return item.name;
+  trackByFn(index: number, item: { id: number; name: string }): number {
+    return item.id;
   }
 
   goHome(): void {

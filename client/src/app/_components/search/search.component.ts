@@ -23,6 +23,7 @@ import { API_BASE_URL } from '../../_shared/config';
 import { Channel } from '../../_models/channel.interface';
 import { DBServerService } from '../../_shared/_services/dbserver-inmemory.service';
 import { Server } from '../../_models/server.interface';
+import { parsePickle } from '../../_shared/pickle-parser';
 import { SearchService } from '../../_shared/_services/search-inmemory.service';
 import { downloadFile } from '../../_shared/_methods/methods';
 import { SearchFormComponent } from './search-form/search-form.component';
@@ -173,25 +174,48 @@ export class SearchComponent implements OnInit, OnDestroy {
    * Parse raw search results into Result objects
    */
   private parseSearchResults(value: string, flatEntry: { server: string; channel: string; id: number } | undefined): Result[] {
-    return value
-      .split('\r\n')
-      .filter(v => v !== '')
-      .map(v => {
-        const entry = v.split(/\s+/);
-        if (!entry || entry.length > 5) return null;
+    const trimmed = value.trim();
+    
+    // Detect Pickle format
+    if (trimmed.startsWith('(')) {
+      try {
+        const parsed = parsePickle(trimmed);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item: any) => {
+            const line = Array.isArray(item) ? item.join(' ') : String(item);
+            return this.parseLine(line, flatEntry);
+          }).filter((item): item is Result => item !== null);
+        }
+      } catch (e) {
+        console.error('Pickle search parse error', e);
+      }
+    }
 
-        return {
-          server: flatEntry?.server ?? '',
-          channel: flatEntry?.channel ?? '',
-          package: entry[0],
-          bot: entry[1],
-          filesize: entry[2],
-          filename: entry.length === 4
-            ? entry[3]
-            : entry.slice(3).join(' ')
-        };
-      })
+    // Fallback to traditional line-based format
+    return trimmed
+      .split('\n')
+      .map(line => this.parseLine(line, flatEntry))
       .filter((item): item is Result => item !== null);
+  }
+
+  /**
+   * Helper to parse a single line of search result
+   */
+  private parseLine(line: string, flatEntry: { server: string; channel: string; id: number } | undefined): Result | null {
+    const v = line.trim();
+    if (!v) return null;
+    
+    const entry = v.split(/\s+/);
+    if (!entry || entry.length < 4) return null;
+
+    return {
+      server: flatEntry?.server ?? '',
+      channel: flatEntry?.channel ?? '',
+      package: entry[0],
+      bot: entry[1],
+      filesize: entry[2],
+      filename: entry.slice(3).join(' ')
+    };
   }
 
   /**
