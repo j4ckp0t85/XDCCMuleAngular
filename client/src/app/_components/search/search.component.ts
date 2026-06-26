@@ -1,22 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import {
   Component,
-  ChangeDetectionStrategy,
+  DestroyRef,
   Injector,
-  OnDestroy,
-  OnInit,
+  effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { forkJoinWithProgress } from '../../_shared/utils';
 import {
-  Subscription,
-  filter,
   ignoreElements,
   merge,
   mergeMap,
   tap,
 } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Result } from '../../_models/result.interface';
 import { Router } from '@angular/router';
 import { API_BASE_URL } from '../../_shared/config';
@@ -45,40 +44,52 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchComponent implements OnInit, OnDestroy {
-  // UI state
-  readonly percentageDone = signal(0);
-  readonly searchInProgress = signal(false);
-  readonly searchText = signal('');
-  readonly searchOnAllServers = signal(false);
-  readonly pageSize = signal(50);
-
-  // Results data
-  readonly results = signal<Result[]>([]);
-
-  // Server data
-  readonly servers = signal<Server[]>([]);
-  readonly searchingServers = signal<Channel[]>([]);
-
-  private flatList: { server: string; channel: string; id: number }[] = [];
-  private readonly subscriptions = new Subscription();
-  private readonly injector = inject(Injector);
-  private readonly httpClient = inject(HttpClient);
-  private readonly router = inject(Router);
+export class SearchComponent {
   private readonly searchService = inject(SearchService);
   private readonly dbServiceServer = inject(DBServerService);
 
+  // UI state from service
+  readonly searchText = this.searchService.searchText;
+  readonly searchOnAllServers = this.searchService.searchOnAllServers;
+  readonly pageSize = this.searchService.pageSize;
+  readonly results = this.searchService.searchResults;
+  readonly searchingServers = this.searchService.searchingServers;
 
-  ngOnInit(): void {
+  // Local UI state
+  readonly percentageDone = signal(0);
+  readonly searchInProgress = signal(false);
+
+  // Server data
+  readonly servers = signal<Server[]>([]);
+
+  private flatList: { server: string; channel: string; id: number }[] = [];
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
+  private readonly httpClient = inject(HttpClient);
+  private readonly router = inject(Router);
+
+  private hasNavigationState = false;
+
+  constructor() {
     this.initializeFromRouterState();
-    this.subscribeToServerList();
-  }
 
-  ngOnDestroy(): void {
-    this.saveSearchValuesInMemory();
-    this.subscriptions.unsubscribe();
+    // React to server list becoming available via rxResource signal
+    effect(() => {
+      const serverList = this.dbServiceServer.serverList();
+      if (serverList && serverList.length > 0) {
+        untracked(() => {
+          this.servers.set(serverList as Server[]);
+          this.createChannelFlatList();
+
+          if (this.hasNavigationState) {
+            this.hasNavigationState = false; // Reset
+            this.onSelectAllServersChange({ checked: true });
+            this.search();
+          }
+        });
+      }
+    });
   }
 
   /**
@@ -86,7 +97,7 @@ export class SearchComponent implements OnInit, OnDestroy {
    */
   private initializeFromRouterState(): void {
     // Try to get state from current navigation
-    const navigation = this.router.getCurrentNavigation();
+    const navigation = this.router.currentNavigation();
     const navigationState = navigation?.extras.state as { searchText: string } | undefined;
 
     // If not available, try to get it from history state (for page refreshes)
@@ -97,31 +108,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     if (state?.searchText) {
       this.searchText.set(state.searchText);
+      this.hasNavigationState = true;
     }
-  }
-
-  /**
-   * Subscribe to server list and initialize data when available
-   */
-  private subscribeToServerList(): void {
-    const dbServerSub = this.dbServiceServer.serverList$
-      .pipe(
-        filter((servers) => servers.length > 0),
-        tap((servers) => {
-          this.servers.set(servers);
-          this.createChannelFlatList();
-
-          if (this.searchText() !== '') {
-            this.onSelectAllServersChange({ checked: true });
-            this.search();
-          } else {
-            this.restoreSearchValuesInMemory();
-          }
-        })
-      )
-      .subscribe();
-
-    this.subscriptions.add(dbServerSub);
   }
 
   /**
@@ -175,7 +163,18 @@ export class SearchComponent implements OnInit, OnDestroy {
    */
   private parseSearchResults(value: string, flatEntry: { server: string; channel: string; id: number } | undefined): Result[] {
     const trimmed = value.trim();
-    
+    const lowerTrimmed = trimmed.toLowerCase();
+
+    // Ignore HTML responses (e.g., error pages, redirect pages, or "PAGINA ERRATA" warning pages)
+    if (
+      lowerTrimmed.includes('<html') ||
+      lowerTrimmed.includes('<!doctype html') ||
+      lowerTrimmed.includes('<body') ||
+      lowerTrimmed.includes('<head')
+    ) {
+      return [];
+    }
+
     // Detect Pickle format
     if (trimmed.startsWith('(')) {
       try {
@@ -204,71 +203,24 @@ export class SearchComponent implements OnInit, OnDestroy {
   private parseLine(line: string, flatEntry: { server: string; channel: string; id: number } | undefined): Result | null {
     const v = line.trim();
     if (!v) return null;
-    
+
     const entry = v.split(/\s+/);
     if (!entry || entry.length < 4) return null;
+
+    // Validate that the first entry is a valid package number (e.g. #123 or 123)
+    const packageId = entry[0];
+    if (!/^#?\d+$/.test(packageId)) {
+      return null;
+    }
 
     return {
       server: flatEntry?.server ?? '',
       channel: flatEntry?.channel ?? '',
-      package: entry[0],
+      package: packageId,
       bot: entry[1],
       filesize: entry[2],
       filename: entry.slice(3).join(' ')
     };
-  }
-
-  /**
-   * Restore search values from memory service
-   */
-  private restoreSearchValuesInMemory(): void {
-    if (this.searchService.pageSize) {
-      this.pageSize.set(this.searchService.pageSize);
-    }
-    if (this.searchService.searchOnAllServers !== undefined) {
-      this.searchOnAllServers.set(this.searchService.searchOnAllServers);
-    }
-    if (this.searchService.searchText) {
-      this.searchText.set(this.searchService.searchText);
-    }
-    if (this.searchService.searchingServers) {
-      this.searchingServers.set(this.searchService.searchingServers);
-    }
-    if (this.searchService.searchResults) {
-      this.results.set(this.searchService.searchResults);
-    }
-  }
-
-  /**
-   * Save current search values to memory service
-   */
-  private saveSearchValuesInMemory(): void {
-    this.searchService.pageSize = this.pageSize();
-    this.searchService.searchOnAllServers = this.searchOnAllServers();
-    this.searchService.searchText = this.searchText();
-    this.searchService.searchingServers = this.searchingServers();
-    this.searchService.searchResults = this.results();
-  }
-
-  /**
-   * Update search text
-   */
-  onSearchTextChange(text: string): void {
-    this.searchText.set(text);
-  }
-
-  /**
-   * Update searching servers
-   */
-  onSearchingServersChange(servers: Channel[]): void {
-    this.searchingServers.set(servers);
-  }
-
-  /**
-   * Update search on all servers flag
-   */
-  onSearchOnAllServersChange(value: boolean): void {
-    this.searchOnAllServers.set(value);
   }
 
   /**
@@ -298,13 +250,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle paginator page size change
-   */
-  onPageSizeChange(size: number): void {
-    this.pageSize.set(size);
-  }
-
-  /**
    * Execute search against selected servers
    */
   search(): void {
@@ -328,7 +273,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       );
     });
 
-    const searchSub = forkJoinWithProgress(requests)
+    forkJoinWithProgress(requests)
       .pipe(
         mergeMap(([finalResult, progress]) =>
           merge(
@@ -340,7 +285,8 @@ export class SearchComponent implements OnInit, OnDestroy {
             ),
             finalResult
           )
-        )
+        ),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: (values) => {
@@ -353,8 +299,6 @@ export class SearchComponent implements OnInit, OnDestroy {
           // Could add error handling UI here
         }
       });
-
-    this.subscriptions.add(searchSub);
   }
 
   /**
@@ -374,16 +318,14 @@ export class SearchComponent implements OnInit, OnDestroy {
     fileName: string;
     fileSize: string;
   }): void {
-    this.subscriptions.add(
-      downloadFile(
-        this.injector,
-        data.server,
-        data.channel,
-        data.bot,
-        data.packageId,
-        data.fileName,
-        data.fileSize
-      )
+    downloadFile(
+      this.injector,
+      data.server,
+      data.channel,
+      data.bot,
+      data.packageId,
+      data.fileName,
+      data.fileSize
     );
   }
 }

@@ -17,13 +17,10 @@
             <!-- Search Form Component -->
             <app-search-form
               [servers]="servers()"
-              [searchText]="searchText()"
-              [searchingServers]="searchingServers()"
-              [searchOnAllServers]="searchOnAllServers()"
+              [(searchText)]="searchText"
+              [(searchingServers)]="searchingServers"
+              [(searchOnAllServers)]="searchOnAllServers"
               [searchInProgress]="searchInProgress()"
-              (searchTextChange)="onSearchTextChange($event)"
-              (searchingServersChange)="onSearchingServersChange($event)"
-              (searchOnAllServersChange)="onSearchOnAllServersChange($event)"
               (search)="search()"
               (serverGroupClick)="onServerGroupClicked($event)"
             ></app-search-form>
@@ -47,8 +44,7 @@
           <div class="results-wrapper">
             <app-search-results
               [results]="results()"
-              [pageSize]="pageSize()"
-              (pageSizeChange)="onPageSizeChange($event)"
+              [(pageSize)]="pageSize"
               (downloadRequest)="onDownloadRequest($event)"
             ></app-search-results>
           </div>

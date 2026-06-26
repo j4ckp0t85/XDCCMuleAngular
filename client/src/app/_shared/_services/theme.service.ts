@@ -1,10 +1,8 @@
-import { Injectable, signal } from '@angular/core';
+import { Service, signal } from '@angular/core';
 
 export type ThemeType = 'light' | 'dark' | 'system';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Service()
 export class ThemeService {
     private readonly THEME_KEY = 'xdccmule-theme';
 

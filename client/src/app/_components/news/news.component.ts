@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras } from '@angular/router';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { API_BASE_URL, NEWS_URL, NEWS_USER_AGENT_GRANT } from '../../_shared/config';
 import { parsePickle } from '../../_shared/pickle-parser';
-import { catchError } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 import { SearchService } from '../../_shared/_services/search-inmemory.service';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
@@ -20,58 +21,35 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
   ],
   templateUrl: './news.component.html',
   styleUrl: './news.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewsComponent {
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly searchService = inject(SearchService);
 
-  readonly news = signal<{ id: number; name: string }[]>([]);
-  readonly isLoading = signal(true);
-
-  // Pagination state
-  readonly first = signal(0);
-  readonly currentPage = signal(0);
-  readonly pageSize = signal(50);
-
-  // Displayed data as computed signal (reacts automatically to news/pagination changes)
-  readonly displayedData = computed(() => {
-    const start = this.first();
-    const end = this.first() + this.pageSize();
-    return this.news().slice(start, end);
-  });
-
-  constructor() {
-    if (this.searchService.news?.length > 0) {
-      this.news.set(this.searchService.news);
-      this.isLoading.set(false);
-    } else {
-      this.fetchNews();
-    }
-  }
-
-  fetchNews(): void {
-    this.httpClient.post(
-      `${API_BASE_URL}/news/`,
-      {
-        newsurl: NEWS_URL,
-        headers: { 'User-Agent': NEWS_USER_AGENT_GRANT },
-      },
-      {
-        responseType: 'text',
+  // Use rxResource to fetch news - handles loading/error/value natively
+  readonly newsResource = rxResource<{ id: number; name: string }[], void>({
+    stream: () => {
+      // Return cached data if available
+      if (this.searchService.news().length > 0) {
+        return of(this.searchService.news());
       }
-    )
-      .pipe(catchError(() => {
-        this.isLoading.set(false);
-        return [];
-      }))
-      .subscribe((res) => {
-        try {
-          if (!res) return;
-          
+
+      return this.httpClient.post(
+        `${API_BASE_URL}/news/`,
+        {
+          newsurl: NEWS_URL,
+          headers: { 'User-Agent': NEWS_USER_AGENT_GRANT },
+        },
+        {
+          responseType: 'text',
+        }
+      ).pipe(
+        map((res) => {
+          if (!res) return [];
+
           const parsed = parsePickle(res);
-          if (!parsed) return;
+          if (!parsed) return [];
 
           const results: { id: number; name: string }[] = [];
           let idCounter = 0;
@@ -85,16 +63,33 @@ export class NewsComponent {
               });
             }
           });
-          
-          this.news.set(results);
-          this.searchService.news = this.news();
-        } catch (error) {
+
+          // Cache results in service signal
+          this.searchService.news.set(results);
+          return results;
+        }),
+        catchError((error) => {
           console.error('Error parsing news pickle:', error);
-        } finally {
-          this.isLoading.set(false);
-        }
-      });
-  }
+          return of([] as { id: number; name: string }[]);
+        })
+      );
+    },
+  });
+
+  readonly news = computed(() => this.newsResource.value() ?? []);
+  readonly isLoading = this.newsResource.isLoading;
+
+  // Pagination state
+  readonly first = signal(0);
+  readonly currentPage = signal(0);
+  readonly pageSize = signal(50);
+
+  // Displayed data as computed signal (reacts automatically to news/pagination changes)
+  readonly displayedData = computed(() => {
+    const start = this.first();
+    const end = this.first() + this.pageSize();
+    return this.news().slice(start, end);
+  });
 
   trackByFn(index: number, item: { id: number; name: string }): number {
     return item.id;
@@ -115,6 +110,6 @@ export class NewsComponent {
       state: { searchText }
     };
     this.router.navigate(['/search'], navigationExtras);
-    this.searchService.searchText = searchText;
+    this.searchService.searchText.set(searchText);
   }
 }

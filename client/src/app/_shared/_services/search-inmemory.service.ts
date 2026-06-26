@@ -1,64 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Service, signal } from '@angular/core';
 import { Result } from '../../_models/result.interface';
-import { Server } from '../../_models/server.interface';
 import { Channel } from '../../_models/channel.interface';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class SearchService {
-  private _searchText!: string;
-  private _searchOnAllServers!: boolean;
-  private _searchResults!: Result[];
-  private _searchingServers!: Channel[];
-  private _pageSize!: number;
-  private _news!: { id: number; name: string }[];
-
-  get pageSize(): number {
-    return this._pageSize;
-  }
-
-  get searchOnAllServers(): boolean {
-    return this._searchOnAllServers;
-  }
-
-  get searchText(): string {
-    return this._searchText;
-  }
-
-  get searchResults(): Result[] {
-    return this._searchResults;
-  }
-
-  get searchingServers(): Channel[] {
-    return this._searchingServers;
-  }
-
-  get news(): { id: number; name: string }[] {
-    return this._news;
-  }
-
-  set pageSize(value: number) {
-    this._pageSize = value;
-  }
-
-  set searchOnAllServers(value: boolean) {
-    this._searchOnAllServers = value;
-  }
-
-  set searchText(value: string) {
-    this._searchText = value;
-  }
-
-  set searchResults(value: Result[]) {
-    this._searchResults = value;
-  }
-
-  set searchingServers(value: Channel[]) {
-    this._searchingServers = value;
-  }
-
-  set news(value: { id: number; name: string }[]) {
-    this._news = value;
-  }
+  public readonly searchText = signal<string>('');
+  public readonly searchOnAllServers = signal<boolean>(false);
+  public readonly searchResults = signal<Result[]>([]);
+  public readonly searchingServers = signal<Channel[]>([]);
+  public readonly pageSize = signal<number>(50);
+  public readonly news = signal<{ id: number; name: string }[]>([]);
 }

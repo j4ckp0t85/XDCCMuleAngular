@@ -1,55 +1,44 @@
-import { Component, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { HttpClient } from '@angular/common/http';
 import { DownloadingFile } from '../../../../_models/downloadingfile.interface';
 import { API_BASE_URL } from '../../../../_shared/config';
 import { LogMessageEvent } from '../../../../_models/logmessage.interface';
-import { catchError, EMPTY, Subscription } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { catchError, EMPTY, of } from 'rxjs';
 
 @Component({
   selector: 'app-logs-dialog',
   imports: [ScrollPanelModule],
   templateUrl: './logs-dialog.component.html',
   styleUrl: './logs-dialog.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LogsDialogComponent implements OnDestroy {
+export class LogsDialogComponent {
   private readonly dialogRef = inject(DynamicDialogRef);
   private readonly config = inject(DynamicDialogConfig);
   private readonly httpClient = inject(HttpClient);
 
-  logs: LogMessageEvent[] = [];
-  private readonly subscriptions = new Subscription();
+  private readonly item = signal(this.config.data?.item as DownloadingFile | undefined);
 
-  constructor() {
-    // Recupera i logs dal servizio
-    const item = this.config.data?.item as DownloadingFile;
-    if (item) {
-      this.fetchLogs(item);
-    }
-  }
+  readonly logsResource = rxResource<LogMessageEvent[], DownloadingFile | undefined>({
+    params: () => this.item(),
+    stream: ({ params: item }) => {
+      if (!item) return of([]);
+      return this.httpClient.post<LogMessageEvent[]>(`${API_BASE_URL}/logs`, {
+        server: item.network,
+        channel: item.channelName,
+        bot: item.botName,
+        package: item.fileNumber,
+        filename: item.fileName,
+        filesize: item.fileSize,
+      }).pipe(catchError(() => of([] as LogMessageEvent[])));
+    },
+  });
 
-  fetchLogs(item: DownloadingFile) {
-    const sub = this.httpClient.post<LogMessageEvent[]>(`${API_BASE_URL}/logs`, {
-      server: item.network,
-      channel: item.channelName,
-      bot: item.botName,
-      package: item.fileNumber,
-      filename: item.fileName,
-      filesize: item.fileSize,
-    })
-      .pipe(catchError(() => EMPTY))
-      .subscribe(response => {
-        this.logs = response || [];
-      });
-  }
+  readonly logs = computed(() => this.logsResource.value() ?? []);
 
   close() {
     this.dialogRef.close();
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 }

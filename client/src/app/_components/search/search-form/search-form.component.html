@@ -9,8 +9,7 @@
             id="search-input"
             class="w-full"
             autocomplete="off"
-            [ngModel]="searchText()"
-            (ngModelChange)="onSearchTextChange($event)"
+            [(ngModel)]="searchText"
           />
         </span>
       </div>
@@ -76,7 +75,7 @@
       <div class="checkbox-container">
         <p-checkbox
           [binary]="true"
-          [(ngModel)]="searchAllServers"
+          [(ngModel)]="searchOnAllServers"
           (onChange)="onSelectAllServersChange($event)"
           inputId="all-servers"
           styleClass="all-servers-checkbox"

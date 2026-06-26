@@ -1,6 +1,6 @@
 <div class="logs-container">
   <div class="flex p-3">
-    @for (message of logs; track message) {
+    @for (message of logs(); track message) {
     <div class="row">
       <span class="col">Nick</span>
       <span class="col">{{ message.nick }}</span>

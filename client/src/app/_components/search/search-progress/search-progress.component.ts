@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 
 @Component({
@@ -6,7 +6,6 @@ import { ProgressBarModule } from 'primeng/progressbar';
   imports: [ProgressBarModule],
   templateUrl: './search-progress.component.html',
   styleUrl: './search-progress.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchProgressComponent {
   readonly percentageDone = input(0);

@@ -1,66 +1,55 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, signal, inject, ChangeDetectionStrategy } from '@angular/core';
-import {
-  EMPTY,
-  Subscription,
-  catchError,
-  interval,
-  of,
-  switchMap,
-} from 'rxjs';
+import { Component, DestroyRef, signal, inject } from '@angular/core';
+import { EMPTY, catchError } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CheckboxModule } from 'primeng/checkbox';
+import { form, FormField } from '@angular/forms/signals';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
 import { BackButtonComponent } from '../../_shared/_components/back-button/back-button.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-reset',
   imports: [
     FormsModule,
-    ReactiveFormsModule,
     CheckboxModule,
     ButtonModule,
-    BackButtonComponent
+    BackButtonComponent,
+    FormField
   ],
   templateUrl: './reset.component.html',
   styleUrl: './reset.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ResetComponent implements OnDestroy {
+export class ResetComponent {
   private readonly router = inject(Router);
   private readonly httpClient = inject(HttpClient);
-  private readonly fb = inject(FormBuilder);
   private readonly messageService = inject(MessageService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  private readonly subscriptions = new Subscription();
-  readonly confFormGroup: FormGroup;
+  readonly data = signal({
+    deleteAllJobs: false,
+    closeAllXdccInstances: false,
+    cleanDownloads: false,
+  });
 
-  constructor() {
-    this.confFormGroup = this.fb.group({
-      deleteAllJobs: this.fb.control(false),
-      closeAllXdccInstances: this.fb.control(false),
-      cleanDownloads: this.fb.control(false),
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
+  readonly confForm = form(this.data);
 
   goHome() {
     this.router.navigate(['/']);
   }
 
   reset() {
-    const resetSub = this.httpClient
-      .post(`${API_BASE_URL}/reset`, this.confFormGroup.getRawValue())
-      .pipe(catchError(() => EMPTY))
+    this.httpClient
+      .post(`${API_BASE_URL}/reset`, this.data())
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => EMPTY)
+      )
       .subscribe(() =>
         this.messageService.add({ severity: 'success', summary: 'Reset completato', detail: '' })
       );
-    this.subscriptions.add(resetSub);
   }
 }

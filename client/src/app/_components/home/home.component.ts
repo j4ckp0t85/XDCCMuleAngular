@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../_shared/_services/theme.service';
 
@@ -7,7 +7,6 @@ import { ThemeService } from '../../_shared/_services/theme.service';
   imports: [RouterModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent {
   readonly themeBase = inject(ThemeService);

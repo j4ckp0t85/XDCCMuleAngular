@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import {
   EMPTY,
-  Subscription,
   catchError,
   interval,
   of,
   switchMap,
 } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { API_BASE_URL } from '../../_shared/config';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -26,35 +26,32 @@ import { BackButtonComponent } from '../../_shared/_components/back-button/back-
   ],
   templateUrl: './active-instances.component.html',
   styleUrl: './active-instances.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
-export class ActiveInstancesComponent implements OnInit, OnDestroy {
+export class ActiveInstancesComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly httpClient = inject(HttpClient);
   private readonly messageService = inject(MessageService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly isFetching = signal(true);
   readonly activeNetworks = signal<{ network: string }[]>([]);
-  private readonly subscriptions = new Subscription();
   readonly displayedColumns = ['network', 'action'];
 
   ngOnInit(): void {
     this.fetchDatas();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
-
   private fetchDatas() {
     this.isFetching.set(true);
-    const instancesSub = interval(1000)
+    interval(1000)
       .pipe(
         switchMap(() => {
           return this.httpClient
             .get<string[]>(`${API_BASE_URL}/activeinstances`)
             .pipe(catchError(() => of([])));
-        })
+        }),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((list) => {
         this.isFetching.set(false);
@@ -69,7 +66,6 @@ export class ActiveInstancesComponent implements OnInit, OnDestroy {
           return { network: x };
         }));
       });
-    this.subscriptions.add(instancesSub);
   }
 
   goHome() {
@@ -77,12 +73,14 @@ export class ActiveInstancesComponent implements OnInit, OnDestroy {
   }
 
   quitInstance(network: string) {
-    const quitSub = this.httpClient
+    this.httpClient
       .post(`${API_BASE_URL}/quitinstance`, { network })
-      .pipe(catchError(() => EMPTY))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => EMPTY)
+      )
       .subscribe(() =>
         this.messageService.add({ severity: 'success', summary: `Network ${network} rimosso`, detail: '' })
       );
-    this.subscriptions.add(quitSub);
   }
 }

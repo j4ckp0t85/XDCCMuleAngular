@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, input, output, signal, effect, untracked } from '@angular/core';
+import { Component, computed, input, model, output, signal, effect, untracked } from '@angular/core';
 import { Result } from '../../../_models/result.interface';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
@@ -10,15 +10,13 @@ import { PaginatorState } from 'primeng/paginator';
   imports: [TableModule, PaginatorModule, ButtonModule],
   templateUrl: './search-results.component.html',
   styleUrl: './search-results.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchResultsComponent {
   // Inputs
   readonly results = input<Result[]>([]);
-  readonly pageSize = input(50);
+  readonly pageSize = model(50);
 
   // Outputs
-  readonly pageSizeChange = output<number>();
   readonly downloadRequest = output<{
     server: string;
     channel: string;
@@ -67,8 +65,8 @@ export class SearchResultsComponent {
     this.first.set(event.first ?? 0);
     this.currentPage.set(event.page ?? 0);
 
-    if (event.rows !== this.pageSize()) {
-      this.pageSizeChange.emit(event.rows ?? this.pageSize());
+    if (event.rows !== undefined && event.rows !== this.pageSize()) {
+      this.pageSize.set(event.rows);
     }
   }
 

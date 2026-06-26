@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { ThemeService } from './_shared/_services/theme.service';
@@ -8,7 +8,6 @@ import { ThemeService } from './_shared/_services/theme.service';
   imports: [RouterOutlet, ToastModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   readonly title = 'xdcc-angular';

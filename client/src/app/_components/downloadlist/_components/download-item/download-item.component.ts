@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, inject, input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
 import { KnobModule } from 'primeng/knob';
@@ -9,7 +9,7 @@ import { DownloadableFile, DownloadingFile } from '../../../../_models/downloadi
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { API_BASE_URL } from '../../../../_shared/config';
-import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { LogsDialogComponent } from '../logs-dialog/logs-dialog.component';
 
@@ -26,7 +26,7 @@ import { LogsDialogComponent } from '../logs-dialog/logs-dialog.component';
   templateUrl: './download-item.component.html',
   styleUrl: './download-item.component.scss',
   providers: [DialogService],
-  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class DownloadItemComponent implements OnDestroy {
   readonly item = input.required<DownloadingFile>();
@@ -35,8 +35,8 @@ export class DownloadItemComponent implements OnDestroy {
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly dialogService = inject(DialogService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  private readonly subscriptions = new Subscription();
   private dialogRef: DynamicDialogRef | null | undefined;
 
   getProgressColor(item: DownloadingFile): string {
@@ -68,12 +68,12 @@ export class DownloadItemComponent implements OnDestroy {
       fileName: item.fileName,
       fileSize: item.fileSize
     }
-    const retrySub = this.httpClient
+    this.httpClient
       .post(`${API_BASE_URL}/download`, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         item.status = 'pending';
       });
-    this.subscriptions.add(retrySub);
   }
 
   showLogs() {
@@ -88,9 +88,11 @@ export class DownloadItemComponent implements OnDestroy {
       }
     });
 
-    this.dialogRef?.onClose.subscribe(() => {
-      this.dialogRef = undefined;
-    });
+    this.dialogRef?.onClose
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.dialogRef = undefined;
+      });
   }
 
   cancelDL() {
@@ -103,12 +105,12 @@ export class DownloadItemComponent implements OnDestroy {
       fileName: item.fileName,
       fileSize: item.fileSize
     }
-    const cancelSub = this.httpClient
+    this.httpClient
       .post(`${API_BASE_URL}/cancel`, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         item.status = 'cancelled';
       });
-    this.subscriptions.add(cancelSub);
   }
 
   clearCompletedDL() {
@@ -121,16 +123,15 @@ export class DownloadItemComponent implements OnDestroy {
       fileName: item.fileName,
       fileSize: item.fileSize
     }
-    const clearSub = this.httpClient
+    this.httpClient
       .post(`${API_BASE_URL}/clearcompleted`, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
-    this.subscriptions.add(clearSub);
   }
 
   ngOnDestroy(): void {
     if (this.dialogRef) {
       this.dialogRef.close();
     }
-    this.subscriptions.unsubscribe();
   }
 }

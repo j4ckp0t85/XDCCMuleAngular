@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import {
-  ChangeDetectionStrategy,
   Component,
-  OnDestroy,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -10,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { Subscription, interval, startWith, switchMap, catchError, EMPTY } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   DownloadingFile,
   StatusOption,
@@ -36,9 +36,9 @@ import { MessageService } from 'primeng/api';
   ],
   templateUrl: './downloadlist.component.html',
   styleUrl: './downloadlist.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
-export class DownloadlistComponent implements OnInit, OnDestroy {
+export class DownloadlistComponent implements OnInit {
   private readonly LAYOUT_STORAGE_KEY = 'downloadlist-layout';
 
   readonly downloadList = signal<DownloadingFile[]>([]);
@@ -70,12 +70,12 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
     return this.downloadList().slice(start, end);
   });
 
-  private readonly subscriptions = new Subscription();
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly messageService = inject(MessageService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  private actualSubscription!: Subscription | undefined;
+  private actualSubscription?: Subscription;
 
 
   /**
@@ -113,9 +113,12 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
    * Clean downloads by calling the reset API with cleanDownloads: true
    */
   cleanDownloads(): void {
-    const resetSub = this.httpClient
+    this.httpClient
       .post(`${API_BASE_URL}/reset`, { cleanDownloads: true })
-      .pipe(catchError(() => EMPTY))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => EMPTY)
+      )
       .subscribe(() => {
         this.messageService.add({
           severity: 'success',
@@ -124,7 +127,6 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
         });
         this.fetchList(); // Refresh the list after cleaning
       });
-    this.subscriptions.add(resetSub);
   }
 
   private mockDatas() {
@@ -254,10 +256,7 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
   }
 
   fetchList() {
-    if (this.actualSubscription) {
-      this.subscriptions.remove(this.actualSubscription);
-      this.actualSubscription = undefined;
-    }
+    this.actualSubscription?.unsubscribe();
 
     this.actualSubscription = interval(1000)
       .pipe(
@@ -266,12 +265,12 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
           return this.httpClient.get<DownloadingFile[]>(
             `${API_BASE_URL}/downloadlist?status=${this.statusFilter}`
           );
-        })
+        }),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((result: DownloadingFile[]) => {
         this.downloadList.set(result.map(res => Object.assign({} as DownloadingFile, res, { percentage: Math.round(res.percentage) })));
       });
-    this.subscriptions.add(this.actualSubscription);
 
     if (this.statusFilter === 'all') {
       // Already set by mockDatas()
@@ -298,7 +297,4 @@ export class DownloadlistComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
 }
